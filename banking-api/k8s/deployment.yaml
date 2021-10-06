@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: banking-api
+  labels:
+    app: banking-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: banking-api
+  template:
+    metadata:
+      labels:
+        app: banking-api
+    spec:
+      containers:
+        - name: banking-api
+          image: eu.gcr.io/adam-playground-315708/banking-api:latest
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: Always
+        - name: opa
+          args:
+            - run
+            - --server
+            - --config-file=/config/opa-conf.yaml
+          image: "openpolicyagent/opa:0.32.0"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /config
+              name: opa-config-vol
+              readOnly: true
+      volumes:
+        - configMap:
+            name: opa-config
+          name: opa-config-vol
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: banking-api
+  labels:
+    app: banking-api
+spec:
+  selector:
+    app: banking-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+  type: ClusterIP

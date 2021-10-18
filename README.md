@@ -61,7 +61,7 @@ curl -X PUT "https://${TENANT}/v1/datasources/global/jwt" \
 --data-raw '{
     "category": "git/rego",                           
     "type": "pull",
-    "url": git@github.com:adam-sandor/das-demo.git,   
+    "url": "git@github.com:adam-sandor/das-demo.git",   
     "path": "policy/library/global/jwt",
     "reference": "refs/heads/main",
     "ssh_credentials": 

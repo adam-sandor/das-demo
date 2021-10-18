@@ -7,11 +7,27 @@ code is in a single repo, but in a production setup these would probably be sepa
 ## JWT Library
 
 A simple function parsing the JWT token from the Authorization header is implemented as a Library
-under `policy/library`. It is important to get the package structure and the package declarations in the
-rego files right for Styra DAS to load the Library successfully. The next step is to configure the
-Library in Styra DAS.
+under `policy/library`. 
 
-You will have to have SSH access to the repo, so I recommend forking it so you can use your own keys for access.
+When settings up a Library in Styra DAS it is important to get a few parameters right:
+* The directory structure in the Git repo
+* The package naming in the rego files
+* The Datapath parameter in DAS
+* The Repository path parameter in DAS
+
+Hopefull this example will help you set all this up correctly. The [DAS docs](https://docs.styra.com/v1/docs/policy-organization/global-library/mount-git-repos) 
+also detail this process but I'm trying to help by giving a very clear example.
+
+Note: I recommend forking this repo and using your own fork as Styra DAS will need authenticated access to the repo.
+
+### Configuring with the UI
+
+You can configure a library from the DAS UI by clicking the + button in the left pane. Here a screenshot how
+to configure the different settings. It's important to set Datapath and Repository path correctly.
+
+![](img/library-config-screen.png)
+
+### Configuring with the API
 
 ```shell
 export TENANT="adamsandor.svc.styra.com"  # the tenant URL of SaaS Styra DAS or an on-prem URL 
@@ -52,5 +68,22 @@ curl -X PUT "https://${TENANT}/v1/datasources/global/jwt" \
     {
         "private_key": "git-pk"
     }                               
+}
+```
+
+### Using the function in your rules
+
+See the `policy/system/gateway/policy/com.styra.envoy.ingress/rules/rules/ingress.rego` rule
+for an example on how to actually call the Library function from a System's rules.
+
+The Library's code will be available under the configured Datapath which in our case is
+`data.global.jwt`. Note that it always has to be `data.global` only the path after this is configurable.
+
+```rego
+jwt = {"valid": valid, "payload": payload} {
+  token := data.global.jwt.parse_bearer_token(http_request)
+  valid := io.jwt.verify_hs256(token, "this is super secret")
+
+  [_, payload, _] := io.jwt.decode(token)
 }
 ```

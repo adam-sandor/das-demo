@@ -22,6 +22,6 @@ entitlements["account/modify"] {
   level > 3
 }
 
-allow {
+allowed {
   entitlements[input.action]
 }

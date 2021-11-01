@@ -40,5 +40,5 @@ jobs:
         with:
           message: |
             ```json
-            "${{ steps.replay-results.outputs.content }}"
+            ${{ steps.replay-results.outputs.content }}
             ```

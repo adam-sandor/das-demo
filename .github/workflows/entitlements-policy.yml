@@ -27,27 +27,13 @@ jobs:
         run: |
           styra validate logreplay -p global/jwt=library/global/jwt/jwt.rego --system=dc105efba51d4f59b419d3979d8ae0e6 -o json > ../replay-result1.json
           styra validate logreplay -p entitlements=system/api/entitlements/entitlements.rego --system=fca9a74811204ea6b1d812f115cede2f -o json > ../replay-result2.json
-      - name: Read replay-results 1
-        id: replay-results1
-        uses: sergeysova/jq-action@v2
+      - uses: actions/github-script@v5
+        name: Add results to PR
         with:
-          cmd: 'jq .samples replay-result1.json -r'
-      - name: Read replay-results 2
-        id: replay-results2
-        uses: sergeysova/jq-action@v2
-        with:
-          cmd: 'jq .samples replay-result2.json -r'
-      - name: Add results to PR
-        uses: mshick/add-pr-comment@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          message: |
-            ## Effects of JWT library change on Gateway policies
-            ```json
-            ${{ steps.replay-results1.outputs.value }}
-            ```
-            ## Effects of Entitlements System policy changes
-            ```json
-            ${{ steps.replay-results2.outputs.value }}
-            ```
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👋 Thanks for reporting!'
+            })

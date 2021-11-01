@@ -1,0 +1,28 @@
+name: Verify Pull Request
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: styra/cli
+    defaults:
+      run:
+        shell: sh
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure Styra CLI
+        env:
+          API_KEY: ${{ secrets.ADAMSANDOR_DAS_API_TOKENN }}
+        run:
+          /usr/local/bin/styra-cli configure -i https://adamsandor.svc.styra.com -t ${API_KEY}
+      - name: Test
+        uses: docker://styra/cli
+        with:
+          entrypoint: /usr/local/bin/styra-cli
+          args: styra validate logreplay -p global/jwt=library/global/jwt/jwt.rego --system=dc105efba51d4f59b419d3979d8ae0e6

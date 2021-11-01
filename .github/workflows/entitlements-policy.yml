@@ -22,6 +22,7 @@ jobs:
           chmod +x /usr/local/bin/styra
           styra configure -i https://adamsandor.svc.styra.com -t ${STYRA_API_TOKEN}
       - name: Replay decision logs
+        id: replay
         working-directory: policy
         run: |
           styra validate logreplay -p global/jwt=library/global/jwt/jwt.rego --system=dc105efba51d4f59b419d3979d8ae0e6 -o json > replay-result1.json
@@ -33,4 +34,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           message: |
-            "${{ steps.vars.outputs.replay-result }}"
+            "${{ steps.replay.outputs.replay-result }}"

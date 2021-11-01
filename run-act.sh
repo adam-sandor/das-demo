@@ -1,0 +1,1 @@
+act pull_request -s ADAMSANDOR_DAS_API_TOKEN=-zFENWC3X-GhCVc39fJR50a6F2Chcf9JQ-C67yCuCV_zVcZ5Wa6yTinM -s GITHUB_TOKEN=$GITHUB_TOKEN --container-architecture linux/amd64

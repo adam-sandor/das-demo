@@ -34,4 +34,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           message: |
+            ```json
             "${{ steps.replay.outputs.replay-result }}"
+            ```

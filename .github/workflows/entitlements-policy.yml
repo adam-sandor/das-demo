@@ -27,3 +27,11 @@ jobs:
           styra validate logreplay -p global/jwt=library/global/jwt/jwt.rego --system=dc105efba51d4f59b419d3979d8ae0e6 -o json > replay-result1.json
           styra validate logreplay -p entitlements=system/api/entitlements/entitlements.rego --system=fca9a74811204ea6b1d812f115cede2f -o json > replay-result2.json
           echo ::set-output name=replay-result::$(cat replay-result1.json)
+      - name: Add results to PR
+        uses: mshick/add-pr-comment@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ABC: "abcdef"
+        with:
+          message: |
+            "Hello PR!"

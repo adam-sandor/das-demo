@@ -34,4 +34,4 @@ jobs:
           ABC: "abcdef"
         with:
           message: |
-            "Hello PR! 1${{ env.ABC }}1 2${ABC} 3 ${{ABC}}"
+            "Hello PR! 1${{ env.ABC }}1 2${ABC}"

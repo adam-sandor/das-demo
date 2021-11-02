@@ -10,7 +10,7 @@ level = {
 }
 
 entitlements["account/status"] {
-  jwt.payload.role == "customer_support_2"
+  jwt.payload.role == "customer_support"
 }
 
 entitlements["account/transactions"] {

@@ -25,11 +25,14 @@ jobs:
         id: replay
         working-directory: policy
         run: |
-          styra validate logreplay -p global/jwt=library/global/jwt/jwt.rego --system=dc105efba51d4f59b419d3979d8ae0e6 -o json > ../replay-result1.json
-          styra validate logreplay -p entitlements=system/api/entitlements/entitlements.rego --system=fca9a74811204ea6b1d812f115cede2f -o json > ../replay-result2.json
-          cat ../replay-result1.json
+          mkdir ../replay-results
+          echo "Replaying decision logs for JWT library change on Gateway System"
+          styra validate logreplay -p global/jwt=library/global/jwt/jwt.rego --system=dc105efba51d4f59b419d3979d8ae0e6 -o json > ../replay-results/replay-result1.json
+          echo "Replaying decision logs for changes in Entitlements System"
+          styra validate logreplay -p entitlements=system/api/entitlements/entitlements.rego --system=fca9a74811204ea6b1d812f115cede2f -o json > ../replay-results/replay-result2.json
+          cat ../replay-results/replay-result1.json
           echo "------"
-          cat ../replay-result2.json
+          cat ../replay-results/replay-result2.json
       - uses: actions/github-script@v5
         name: Add results to PR
         with:
@@ -38,22 +41,24 @@ jobs:
 
             var numberOfChanges = 0
             var numberOfErrors = 0
+            var samplesLogged = 0
             var results = ""
 
-            console.log("Here comes...")
-
-            const files = ["replay-result1.json", "replay-result2.json"]
+            const files = fs.readdirSync("replay-results")
             files.forEach((file) => {
-              const resultData = JSON.parse(fs.readFileSync(file, 'utf8'))
+              const resultData = JSON.parse(fs.readFileSync("replay-results/" + file, 'utf8'))
 
               numberOfChanges += resultData.stats.results_changed;
               numberOfErrors += resultData.stats.entries_failed;
               resultData.samples.forEach((sample, i) => {
-                results += "### Sample " + i + ":\n"
-                        + "Path: `" + sample.path + "`\n"
-                        + "Input: \n```\n" + JSON.stringify(sample.input, null, 2) + "\n```\n"
-                        + "Output before change:\n```\n" + JSON.stringify(sample.result, null, 2) + "\n```\n"
-                        + "Output after change:\n```\n" + JSON.stringify(sample.new_result, null, 2) + "\n```\n\n"
+                if (samplesLogged < 4) {
+                  samplesLogged += 1
+                  results += "### Sample " + samplesLogged + ":\n"
+                          + "Path: `" + sample.path + "`\n"
+                          + "Input: \n```\n" + JSON.stringify(sample.input, null, 2) + "\n```\n"
+                          + "Output before change:\n```\n" + JSON.stringify(sample.result, null, 2) + "\n```\n"
+                          + "Output after change:\n```\n" + JSON.stringify(sample.new_result, null, 2) + "\n```\n\n"
+                }
               })
             })
 

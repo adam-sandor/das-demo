@@ -10,6 +10,8 @@ curl -H "Authorization: Bearer $(cat jwt)" localhost:8080/entitlements/1234
 Request entitlements from OPA:
 ```shell
 curl -X POST -H "Content-Type:application/json" -d "{\"input\":{\"jwt\":\"$(cat jwt)\"}}" localhost:8181/v1/data/entitlements
+
+curl -X POST -H "Content-Type:application/json" -d "{\"input\":{\"jwt\":\"$(cat jwt)\", \"action\": \"account/transactions\"}}" localhost:8181/v1/data/entitlements/allowed
 ```
 
 ## Build

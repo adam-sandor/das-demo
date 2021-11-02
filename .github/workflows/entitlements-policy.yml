@@ -1,0 +1,75 @@
+name: Verify Pull Request
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure Styra CLI
+        env:
+          STYRA_API_TOKEN: ${{ secrets.ADAMSANDOR_DAS_API_TOKEN }}
+          STYRA_CLI_URL: https://adamsandor.svc.styra.com/v1/docs/bin/linux/amd64/styra
+        run: |
+          curl -s -H "Authorization: Bearer ${STYRA_API_TOKEN}" -o styra ${STYRA_CLI_URL}
+          mv styra /usr/local/bin/styra
+          chmod +x /usr/local/bin/styra
+          styra configure -i https://adamsandor.svc.styra.com -t ${STYRA_API_TOKEN}
+      - name: Replay decision logs
+        id: replay
+        working-directory: policy
+        run: |
+          styra validate logreplay -p global/jwt=library/global/jwt/jwt.rego --system=dc105efba51d4f59b419d3979d8ae0e6 -o json > ../replay-result1.json
+          styra validate logreplay -p entitlements=system/api/entitlements/entitlements.rego --system=fca9a74811204ea6b1d812f115cede2f -o json > ../replay-result2.json
+          cat ../replay-result1.json
+          echo "------"
+          cat ../replay-result2.json
+      - uses: actions/github-script@v5
+        name: Add results to PR
+        with:
+          script: |
+            const fs = require('fs')
+
+            var numberOfChanges = 0
+            var numberOfErrors = 0
+            var results = ""
+
+            console.log("Here comes...")
+
+            const files = ["replay-result1.json", "replay-result2.json"]
+            files.forEach((file) => {
+              const resultData = JSON.parse(fs.readFileSync(file, 'utf8'))
+
+              numberOfChanges += resultData.stats.results_changed;
+              numberOfErrors += resultData.stats.entries_failed;
+              resultData.samples.forEach((sample, i) => {
+                results += "### Sample " + i + ":\n"
+                        + "Path: `" + sample.path + "`\n"
+                        + "Input: \n```\n" + JSON.stringify(sample.input, null, 2) + "\n```\n"
+                        + "Output before change:\n```\n" + JSON.stringify(sample.result, null, 2) + "\n```\n"
+                        + "Output after change:\n```\n" + JSON.stringify(sample.new_result, null, 2) + "\n```\n\n"
+              })
+            })
+
+            var comment = "No changes in decision logs found by replay"
+            if (numberOfChanges > 0) {
+              comment = "Warning: The changes in this PR lead to " + numberOfChanges + " changes when replaying previous decision logs:\n"
+              + results
+            } else if (numberOfErrors > 0) {
+              comment = "Warning: The changes in this PR lead to " + numberOfErrors + " errors when replaying previous decision logs!"
+            }
+
+            console.log(comment)
+            github.rest.issues.createComment({
+              issue_number: context.issue.number ? context.issue.number : 3,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            })
+

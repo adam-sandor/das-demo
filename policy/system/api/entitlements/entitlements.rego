@@ -6,7 +6,7 @@ jwt = {"payload": payload} {
 
 default level = 1
 level = l {
-  l := jwt.payload.role_level
+  l := to_number(jwt.payload.role_level)
 }
 
 entitlements["account/status"] {

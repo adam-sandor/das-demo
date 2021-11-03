@@ -4,9 +4,9 @@ jwt = {"payload": payload} {
   [_, payload, _] := io.jwt.decode(input.jwt)
 }
 
-default level = 0
-level = {
-  input.token.level
+default level = 1
+level = l {
+  l := jwt.payload.role_level
 }
 
 entitlements["account/status"] {

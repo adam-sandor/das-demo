@@ -19,7 +19,6 @@ entitlements["account/transactions"] {
 
 entitlements["account/modify"] {
   jwt.payload.role == "customer_support"
-  level >= 2
 }
 
 default allowed = false

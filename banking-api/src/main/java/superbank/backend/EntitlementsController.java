@@ -25,6 +25,7 @@ class EntitlementsController {
 
 	@GetMapping("/entitlements")
 	JsonNode entitlements(@RequestHeader(name = "Authorization") String authHeader) {
+		log.info("Received entitlements request");
 		String token = AuthHeader.getBearerToken(authHeader);
 
 		ObjectNode input = new ObjectMapper().createObjectNode();

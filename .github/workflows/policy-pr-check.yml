@@ -1,4 +1,4 @@
-name: Verify Pull Request
+name: Verify Policy Change Pull Request
 
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}
@@ -6,6 +6,9 @@ concurrency:
 on:
   pull_request:
     branches: [ main ]
+#  push:
+#    paths:
+#      - 'policy'
 
 jobs:
   build:

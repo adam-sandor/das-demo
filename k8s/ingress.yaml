@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /entitlements
+            pathType: Prefix
+            backend:
+              service:
+                name: entitlements
+                port:
+                  number: 80
+          - path: /portal
+            pathType: Prefix
+            backend:
+              service:
+                name: portal
+                port:
+                  number: 80
+          - path: /status
+            pathType: Prefix
+            backend:
+              service:
+                name: status
+                port:
+                  number: 80

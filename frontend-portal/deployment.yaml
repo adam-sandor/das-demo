@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: status-service
+  name: portal
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: status-service
+      app: portal
   template:
     metadata:
       labels:
-        app: status-service
+        app: portal
     spec:
       containers:
-        - name: status-service
-          image: europe-west4-docker.pkg.dev/adam-playground-315708/microservice-demo/status-service:latest
+        - name: portal
+          image: europe-west4-docker.pkg.dev/adam-playground-315708/microservice-demo/portal:latest
           ports:
             - containerPort: 80
           imagePullPolicy: Always
@@ -22,12 +22,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: status-service
+  name: portal
   labels:
-    app: status-service
+    app: portal
 spec:
   selector:
-    app: status-service
+    app: portal
   ports:
     - name: http
       port: 80

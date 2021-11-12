@@ -10,14 +10,16 @@
 	</parent>
 
 	<groupId>adamsandor</groupId>
-	<artifactId>rest-demo</artifactId>
+	<artifactId>entitlements</artifactId>
+
 	<version>0.1-SNAPSHOT</version>
-	<name>rest-demo</name>
-	<description>REST interface showcase</description>
+	<name>Entitlements Service</name>
 
 	<properties>
 		<java.version>16</java.version>
+		<image.repo>europe-west4-docker.pkg.dev/adam-playground-315708/microservice-demo</image.repo>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -72,12 +74,10 @@
 			<plugin>
 				<groupId>com.google.cloud.tools</groupId>
 				<artifactId>jib-maven-plugin</artifactId>
-				<version>3.1.1</version>
+				<version>3.1.4</version>
 				<configuration>
 					<to>
-						<image>eu.gcr.io/adam-playground-315708/banking-api:${project.version}</image>
-						<image>eu.gcr.io/adam-playground-315708/banking-api:latest</image>
-						<credHelper>gcr</credHelper>
+						<image>${image.repo}/${project.artifactId}:latest</image>
 					</to>
 					<from>
 						<image>openjdk:16.0.1</image>

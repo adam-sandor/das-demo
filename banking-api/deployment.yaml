@@ -1,22 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: banking-api
-  labels:
-    app: banking-api
+  name: entitlements
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: banking-api
+      app: entitlements
   template:
     metadata:
       labels:
-        app: banking-api
+        app: entitlements
     spec:
       containers:
-        - name: banking-api
-          image: eu.gcr.io/adam-playground-315708/banking-api:latest
+        - name: entitlements
+          image: europe-west4-docker.pkg.dev/adam-playground-315708/microservice-demo/entitlements:latest
           ports:
             - containerPort: 8080
           imagePullPolicy: Always
@@ -25,7 +23,7 @@ spec:
             - run
             - --server
             - --config-file=/config/opa-conf.yaml
-          image: "openpolicyagent/opa:0.32.0"
+          image: "openpolicyagent/opa:0.34.1"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /config
@@ -39,12 +37,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: banking-api
+  name: entitlements
   labels:
-    app: banking-api
+    app: entitlements
 spec:
   selector:
-    app: banking-api
+    app: entitlements
   ports:
     - name: http
       port: 80

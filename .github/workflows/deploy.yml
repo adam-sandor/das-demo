@@ -13,6 +13,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - id: login-to-artifact-registry
+      env:
+        GCP_SA_CREDS: ${{ secrets.GKE_SERVICE_ACCOUNT }}
+      run: \
+        echo "${GCP_SA_CREDS}" | docker login -u _json_key_base64 --password-stdin https://europe-west4-docker.pkg.dev
+    - id: build-push-images
+      run: \
+        cd banking-api
+        ./build.sh
+        cd ../frontend-portal
+        ./build.sh
+        cd ../status-service
+        ./build.sh
     - id: get-credentials
       uses: google-github-actions/get-gke-credentials@main
       with:

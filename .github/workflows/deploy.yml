@@ -20,6 +20,6 @@ jobs:
         location: europe-north1-a
         credentials: ${{ secrets.GKE_SERVICE_ACCOUNT }}
     - name: Deploy to Kubernetes
-      run: deploy-everything.sh
+      run: ./deploy-everything.sh
 
 

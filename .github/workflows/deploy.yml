@@ -17,7 +17,13 @@ jobs:
       env:
         GCP_SA_CREDS: ${{ secrets.GKE_SERVICE_ACCOUNT }}
       run: |
-        echo "${GCP_SA_CREDS}" | docker login -u _json_key_base64 --password-stdin https://europe-west4-docker.pkg.dev
+        echo "${GCP_SA_CREDS}" | base64 > key.json
+        cat key.json | docker login -u _json_key_base64 --password-stdin https://europe-west4-docker.pkg.dev
+    - name: Set up Java and Maven
+      uses: actions/setup-java@v2
+      with:
+        java-version: 11
+        distribution: adopt-hotspot
     - id: build-push-images
       run: |
         cd banking-api

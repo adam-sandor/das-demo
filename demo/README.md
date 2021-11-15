@@ -4,7 +4,7 @@
 
 Request entitlements from application:
 ```shell
-curl -H "Authorization: Bearer $(cat jwt)" localhost:8080/entitlements/1234
+curl -H "Authorization: Bearer $(cat jane-doe-us.jwt)" localhost:8080/entitlements
 ```
 
 Request entitlements from OPA:
@@ -24,11 +24,11 @@ docker buildx build --platform linux/amd64 --push -t eu.gcr.io/adam-playground-3
 ## Demo
 
 ```shell
-curl http://34.88.103.87/status/up
+curl http://${INGRESS_IP}/status/up
 
-curl http://34.88.103.87/status/details
-curl -H "Authorization: Bearer $(cat jwt2)" http://34.88.103.87/status/details
+curl http://${INGRESS_IP}/status/details
+curl -H "Authorization: Bearer $(cat jane-doe-us.jwt)" http://${INGRESS_IP}/status/details
 
-curl -H "Authorization: Bearer $(cat jwt2)" http://34.88.103.87/banking-api/entitlements/1234
-curl -H "Authorization: Bearer $(cat jwt)" http://34.88.103.87/banking-api/entitlements/1234
+curl -H "Authorization: Bearer $(cat john-doe-us.jwt)" http://${INGRESS_IP}/entitlements
+curl -H "Authorization: Bearer $(cat jane-doe-us.jwt)" http://${INGRESS_IP}/entitlements
 ```

@@ -29,6 +29,8 @@ jobs:
       run: |
         cd entitlements
         ./build.sh
+        cd accounts
+        ./build.sh
         cd ../frontend-portal
         ./build.sh
         cd ../status-service

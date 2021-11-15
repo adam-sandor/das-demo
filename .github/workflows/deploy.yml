@@ -24,6 +24,7 @@ jobs:
       with:
         java-version: 11
         distribution: adopt-hotspot
+        cache: maven
     - id: build-push-images
       run: |
         cd banking-api

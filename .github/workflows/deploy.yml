@@ -27,7 +27,7 @@ jobs:
         cache: maven
     - id: build-push-images
       run: |
-        cd banking-api
+        cd entitlements
         ./build.sh
         cd ../frontend-portal
         ./build.sh

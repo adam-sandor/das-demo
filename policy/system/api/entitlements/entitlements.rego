@@ -15,10 +15,12 @@ entitlements["account/status"] {
 
 entitlements["account/transactions"] {
   jwt.payload.role == "customer_support"
+  level >= 2
 }
 
 entitlements["account/modify"] {
   jwt.payload.role == "customer_support"
+  level >= 3
 }
 
 default allowed = false

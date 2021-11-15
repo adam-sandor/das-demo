@@ -1,4 +1,4 @@
-package superbank.backend;
+package superbank.entitlements;
 
 import com.bisnode.opa.client.OpaClient;
 import com.bisnode.opa.client.query.QueryForDocumentRequest;

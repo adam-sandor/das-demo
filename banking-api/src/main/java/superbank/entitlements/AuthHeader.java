@@ -1,4 +1,4 @@
-package superbank.backend;
+package superbank.entitlements;
 
 public class AuthHeader {
 

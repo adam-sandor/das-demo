@@ -6,11 +6,12 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: status-service
+      app.kubernetes.io/component: status-service
   template:
     metadata:
       labels:
-        app: status-service
+        app.kubernetes.io/name: das-microservice-demo
+        app.kubernetes.io/component: status-service
     spec:
       containers:
         - name: status-service
@@ -24,10 +25,11 @@ kind: Service
 metadata:
   name: status-service
   labels:
-    app: status-service
+    app.kubernetes.io/name: das-microservice-demo
+    app.kubernetes.io/component: status-service
 spec:
   selector:
-    app: status-service
+    app.kubernetes.io/component: status-service
   ports:
     - name: http
       port: 80

@@ -6,11 +6,12 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: portal
+      app.kubernetes.io/component: portal
   template:
     metadata:
       labels:
-        app: portal
+        app.kubernetes.io/name: das-microservice-demo
+        app.kubernetes.io/component: portal
     spec:
       containers:
         - name: portal
@@ -24,10 +25,11 @@ kind: Service
 metadata:
   name: portal
   labels:
-    app: portal
+    app.kubernetes.io/name: das-microservice-demo
+    app.kubernetes.io/component: portal
 spec:
   selector:
-    app: portal
+    app.kubernetes.io/component: portal
   ports:
     - name: http
       port: 80

@@ -6,11 +6,12 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: entitlements
+      app.kubernetes.io/component: entitlements
   template:
     metadata:
       labels:
-        app: entitlements
+        app.kubernetes.io/name: das-microservice-demo
+        app.kubernetes.io/component: entitlements
     spec:
       containers:
         - name: entitlements
@@ -39,10 +40,11 @@ kind: Service
 metadata:
   name: entitlements
   labels:
-    app: entitlements
+    app.kubernetes.io/name: das-microservice-demo
+    app.kubernetes.io/component: entitlements
 spec:
   selector:
-    app: entitlements
+    app.kubernetes.io/component: entitlements
   ports:
     - name: http
       port: 80

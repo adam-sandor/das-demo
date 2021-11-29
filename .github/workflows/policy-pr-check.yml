@@ -6,9 +6,8 @@ concurrency:
 on:
   pull_request:
     branches: [ main ]
-#  push:
-#    paths:
-#      - 'policy'
+    paths:
+      - 'policy/entitlements'
 
 jobs:
   build:

@@ -39,3 +39,9 @@ Kubernetes deployment manifests for all components.
 #### `/provisioning/das`
 
 Scripts that create Systems, Libraries and other objects in DAS.
+
+#### `.github/workflows`
+
+`deploy.yml`: Builds Docker images and deploys them to Kubernetes when main changes
+
+`policy-pr-check`: Runs decision log replay on PRs and adds comment on PR whether policy changes are causing decision changes

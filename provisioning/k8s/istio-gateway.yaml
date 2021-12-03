@@ -1,0 +1,33 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: banking-demo
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - banking-demo.styra-sa.com
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: banking-demo
+spec:
+  hosts:
+    - banking-demo.styra-sa.com
+  gateways:
+    - banking-demo
+  http:
+    - match:
+        - uri:
+            prefix: /portal
+      route:
+        - destination:
+            port:
+              number: 80
+            host: portal

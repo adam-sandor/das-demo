@@ -12,6 +12,7 @@ spec:
       labels:
         app.kubernetes.io/name: das-microservice-demo
         app.kubernetes.io/component: status
+        opa-istio-authz: "yes"
     spec:
       containers:
         - name: status-service

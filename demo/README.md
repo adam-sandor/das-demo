@@ -24,11 +24,11 @@ docker buildx build --platform linux/amd64 --push -t eu.gcr.io/adam-playground-3
 ## Demo
 
 ```shell
-curl http://${INGRESS_IP}/status/up
+curl http://${INGRESS}/status/up
 
-curl http://${INGRESS_IP}/status/details
-curl -H "Authorization: Bearer $(cat jane-doe-us.jwt)" http://${INGRESS_IP}/status/details
+curl http://${INGRESS}/status/details
+curl -H "Authorization: Bearer $(cat jane-doe-us.jwt)" "http://${INGRESS}/status/details"
 
-curl -H "Authorization: Bearer $(cat john-doe-us.jwt)" http://${INGRESS_IP}/entitlements
-curl -H "Authorization: Bearer $(cat jane-doe-us.jwt)" http://${INGRESS_IP}/entitlements
+curl -H "Authorization: Bearer $(cat john-doe-us.jwt)" "http://${INGRESS}/entitlements"
+curl -H "Authorization: Bearer $(cat jane-doe-us.jwt)" "http://${INGRESS}/entitlements"
 ```

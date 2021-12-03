@@ -31,3 +31,19 @@ spec:
             port:
               number: 80
             host: portal
+    - match:
+        - uri:
+            prefix: /account
+      route:
+        - destination:
+            port:
+              number: 80
+            host: account
+    - match:
+        - uri:
+            prefix: /entitlements
+      route:
+        - destination:
+            port:
+              number: 80
+            host: entitlements

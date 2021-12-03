@@ -15,7 +15,7 @@ entitlements["account/status"] {
 
 entitlements["account/transactions"] {
   jwt.payload.role == "customer_support"
-  level >= 2
+  level >= 3
 }
 
 entitlements["account/modify"] {

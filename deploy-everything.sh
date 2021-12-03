@@ -1,11 +1,6 @@
 NS=microservice-demo
 
-kubectl apply -f entitlements/deployment.yaml -n $NS
-kubectl apply -f account/deployment.yaml -n $NS
-kubectl apply -f frontend-portal/deployment.yaml -n $NS
-kubectl apply -f status-service/deployment.yaml -n $NS
-
-kubectl apply -f k8s/ingress.yaml -n $NS
+kubectl apply -f provisioning/k8s -n $NS
 
 #we rely on ImagePullPolicy: Always for redeployment of images
 kubectl delete pod -l app.kubernetes.io/name=das-microservice-demo -n $NS

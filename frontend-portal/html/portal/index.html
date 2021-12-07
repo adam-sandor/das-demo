@@ -37,7 +37,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#"><span class="glyphicon glyphicon-globe"></span> Logo</a>
+                <a class="navbar-brand" href="#"><span class="glyphicon glyphicon-globe"></span> Superbank</a>
             </div>
             <!-- Navbar links -->
             <div class="collapse navbar-collapse" id="navbar">
@@ -130,13 +130,13 @@
 		<div class="col-sm-6">
 		
 			<!-- Alert -->
-			<div class="alert alert-success alert-dismissible" role="alert">
+			<div id="error" class="alert alert-danger alert-dismissible" role="alert" style="display: none">
 				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<strong>Incoming money:</strong> 234 users deposited money 2,566,222$ in the last 24h!
+				<p class="error-text"></p>
 			</div>		
 		
 			<!-- Articles -->
-			<div class="row" id="account-status">
+			<div class="row" id="account-status" style="display: none">
 				<div class="col-xs-12">
 					<h2>Check Account Status</h2>
 					<p class="result"></p>
@@ -151,7 +151,7 @@
 				</div>
 			</div>
 			<hr>
-			<div class="row" id="account-transactions">
+			<div class="row" id="account-transactions" style="display: none">
 				<div class="col-xs-12">
 					<h2>List Account Transactions</h2>
 					<p class="results"></p>
@@ -166,7 +166,7 @@
 				</div>
 			</div>
 			<hr>
-			<div class="row" id="account-modify">
+			<div class="row" id="account-modify" style="display: none">
 				<div class="col-xs-12">
 					<h2>Modify Account Data</h2>
 					<div class="panel-body">

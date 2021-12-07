@@ -1,7 +1,6 @@
 package superbank.entitlements;
 
 import com.bisnode.opa.client.OpaClient;
-import com.bisnode.opa.client.query.QueryForDocumentRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -13,9 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import superbank.entitlements.entities.Account;
+
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -24,19 +25,29 @@ class AccountController {
 
 	private final OpaClient opaClient;
 
+	private final AccountRepository accountRepository;
+
+	private final AccountHolderRepository accountHolderRepository;
+
 	private static final Logger log = LoggerFactory.getLogger(AccountController.class);
 
-	public AccountController(@Autowired OpaClient opaClient) {
+	public AccountController(@Autowired OpaClient opaClient,
+							 @Autowired AccountRepository accountRepository,
+							 @Autowired AccountHolderRepository accountHolderRepository) {
 		this.opaClient = opaClient;
+		this.accountRepository = accountRepository;
+		this.accountHolderRepository = accountHolderRepository;
 	}
 
 	@GetMapping("/account/{accountId}/status")
-	ResponseEntity<ObjectNode> accountStatus(@PathVariable(name = "accountId") String accountId) {
-		ObjectNode accountStatus = new ObjectMapper().createObjectNode();
-		accountStatus.put("accountId", accountId);
-		accountStatus.put("status", "active");
-		accountStatus.put("lastTransaction", LocalDateTime.of(2021, 11, 2, 14, 22, 40).toString());
-		return new ResponseEntity<>(accountStatus, HttpStatus.OK);
+	ResponseEntity<Account> accountStatus(@PathVariable(name = "accountId") Long accountId) {
+		Optional<Account> account = accountRepository.findById(accountId);
+		if (account.isPresent()) {
+			return new ResponseEntity<>(account.get(), HttpStatus.OK);
+		} else {
+			log.info("Account with ID {} not found", accountId);
+			return ResponseEntity.notFound().build();
+		}
 	}
 
 	@GetMapping("/account/{accountId}/transactions")

@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import superbank.entitlements.entities.Account;
+import superbank.entitlements.entities.Transaction;
 
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -29,38 +30,42 @@ class AccountController {
 
 	private final AccountHolderRepository accountHolderRepository;
 
+	private final TransactionRepository transactionRepository;
+
 	private static final Logger log = LoggerFactory.getLogger(AccountController.class);
 
 	public AccountController(@Autowired OpaClient opaClient,
 							 @Autowired AccountRepository accountRepository,
-							 @Autowired AccountHolderRepository accountHolderRepository) {
+							 @Autowired AccountHolderRepository accountHolderRepository,
+							 @Autowired TransactionRepository transactionRepository) {
 		this.opaClient = opaClient;
 		this.accountRepository = accountRepository;
 		this.accountHolderRepository = accountHolderRepository;
+		this.transactionRepository = transactionRepository;
 	}
 
-	@GetMapping("/account/{accountId}/status")
-	ResponseEntity<Account> accountStatus(@PathVariable(name = "accountId") Long accountId) {
-		Optional<Account> account = accountRepository.findById(accountId);
+	@GetMapping("/account/{accountIban}/status")
+	ResponseEntity<Account> accountStatus(@PathVariable(name = "accountIban") String accountIban) {
+		Optional<Account> account = accountRepository.findAccountByIban(accountIban);
 		if (account.isPresent()) {
 			return new ResponseEntity<>(account.get(), HttpStatus.OK);
 		} else {
-			log.info("Account with ID {} not found", accountId);
 			return ResponseEntity.notFound().build();
 		}
 	}
 
-	@GetMapping("/account/{accountId}/transactions")
-	ResponseEntity<ObjectNode> accountTransactions(@PathVariable(name = "accountId") String accountId) {
+	@GetMapping("/account/{accountIban}/transactions")
+	ResponseEntity<ObjectNode> accountTransactions(@PathVariable(name = "accountIban") String accountIban) {
+		List<Transaction> dbTransactions = transactionRepository.findAllByAccountIban(accountIban);
+
 		ObjectNode transactions = new ObjectMapper().createObjectNode();
-		transactions.put("accountId", accountId);
+		transactions.put("accountIban", accountIban);
 		ArrayNode transactionList = transactions.putArray("transactionList");
-		IntStream.range(0, RandomUtils.nextInt(4, 10)).forEach(i -> {
+		dbTransactions.forEach(t -> {
 			ObjectNode transaction = new ObjectMapper().createObjectNode();
-			transaction.put("id", UUID.randomUUID().toString());
-			transaction.put("fromAccount", "NLINGB000004354563456");
-			transaction.put("toAccount", "GB444B000004354563456");
-			transaction.put("amount", RandomUtils.nextInt(100, 5000));
+			transaction.put("otherAccountIban", t.getOtherAccountIban());
+			transaction.put("amount", t.getAmount());
+			transaction.put("type", t.getType().name());
 			transactionList.add(transaction);
 		});
 		return new ResponseEntity<>(transactions, HttpStatus.OK);

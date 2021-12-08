@@ -12,33 +12,33 @@ public class Transaction {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    private String sourceAccount;
-    private String destinationAccount;
+    private String otherAccountIban;
     private Double amount;
     @ManyToOne
     private Account account;
     private Instant timeStamp;
+    private TransactionType type;
 
     protected Transaction() {}
 
-    public Transaction(String sourceAccount, String destinationAccount, Double amount, Account account, Instant timeStamp) {
-        this.sourceAccount = sourceAccount;
-        this.destinationAccount = destinationAccount;
+    public Transaction(String otherAccountIban, Double amount, Account account, Instant timeStamp, TransactionType type) {
+        this.otherAccountIban = otherAccountIban;
         this.amount = amount;
         this.account = account;
         this.timeStamp = timeStamp;
+        this.type = type;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getSourceAccount() {
-        return sourceAccount;
+    public String getOtherAccountIban() {
+        return otherAccountIban;
     }
 
-    public String getDestinationAccount() {
-        return destinationAccount;
+    public TransactionType getType() {
+        return type;
     }
 
     public Double getAmount() {

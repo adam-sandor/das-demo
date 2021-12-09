@@ -28,23 +28,15 @@ import java.util.stream.Collectors;
 @RestController
 class AccountController {
 
-	private final OpaClient opaClient;
-
 	private final AccountRepository accountRepository;
-
-	private final AccountHolderRepository accountHolderRepository;
 
 	private final TransactionRepository transactionRepository;
 
 	private static final Logger log = LoggerFactory.getLogger(AccountController.class);
 
-	public AccountController(@Autowired OpaClient opaClient,
-							 @Autowired AccountRepository accountRepository,
-							 @Autowired AccountHolderRepository accountHolderRepository,
+	public AccountController(@Autowired AccountRepository accountRepository,
 							 @Autowired TransactionRepository transactionRepository) {
-		this.opaClient = opaClient;
 		this.accountRepository = accountRepository;
-		this.accountHolderRepository = accountHolderRepository;
 		this.transactionRepository = transactionRepository;
 	}
 

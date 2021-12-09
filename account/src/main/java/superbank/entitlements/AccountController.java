@@ -1,25 +1,29 @@
 package superbank.entitlements;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.bisnode.opa.client.OpaClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import superbank.entitlements.entities.Account;
 import superbank.entitlements.entities.Transaction;
+import superbank.entitlements.entities.TransactionResult;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.IntStream;
+import java.util.stream.Collectors;
 
 @RestController
 class AccountController {
@@ -45,29 +49,52 @@ class AccountController {
 	}
 
 	@GetMapping("/account/{accountIban}/status")
-	ResponseEntity<Account> accountStatus(@PathVariable(name = "accountIban") String accountIban) {
-		Optional<Account> account = accountRepository.findAccountByIban(accountIban);
-		if (account.isPresent()) {
-			return new ResponseEntity<>(account.get(), HttpStatus.OK);
+	ResponseEntity<Account> accountStatus(@PathVariable(name = "accountIban") String accountIban,
+										  @RequestHeader(name = "Authorization") String authHeader) {
+		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
+		if (StringUtils.equals(jwt.getClaim("role").asString(), "customer_support") &&
+			jwt.getClaim("role_level").asInt() >= 1) {
+			Optional<Account> account = accountRepository.findAccountByIban(accountIban);
+			if (account.isPresent()) {
+				return new ResponseEntity<>(account.get(), HttpStatus.OK);
+			} else {
+				return ResponseEntity.notFound().build();
+			}
 		} else {
-			return ResponseEntity.notFound().build();
+			return ResponseEntity.status(403).build();
 		}
 	}
 
 	@GetMapping("/account/{accountIban}/transactions")
-	ResponseEntity<ObjectNode> accountTransactions(@PathVariable(name = "accountIban") String accountIban) {
-		List<Transaction> dbTransactions = transactionRepository.findAllByAccountIban(accountIban);
+	ResponseEntity<ObjectNode> accountTransactions(@PathVariable(name = "accountIban") String accountIban,
+												   @RequestHeader(name = "Authorization") String authHeader) {
+		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
+		if (StringUtils.equals(jwt.getClaim("role").asString(), "customer_support")) {
+			List<Transaction> dbTransactions = transactionRepository.findAllByAccountIban(accountIban, Sort.by(Sort.Direction.DESC, "timeStamp"));
 
-		ObjectNode transactions = new ObjectMapper().createObjectNode();
-		transactions.put("accountIban", accountIban);
-		ArrayNode transactionList = transactions.putArray("transactionList");
-		dbTransactions.forEach(t -> {
-			ObjectNode transaction = new ObjectMapper().createObjectNode();
-			transaction.put("otherAccountIban", t.getOtherAccountIban());
-			transaction.put("amount", t.getAmount());
-			transaction.put("type", t.getType().name());
-			transactionList.add(transaction);
-		});
-		return new ResponseEntity<>(transactions, HttpStatus.OK);
+			List<Transaction> filteredTransactions = dbTransactions.stream().filter(t -> {
+				if (jwt.getClaim("role_level").asInt() < 3) {
+					return t.getResult() != TransactionResult.SUCCESS;
+				} else {
+					return true;
+				}
+			}).collect(Collectors.toList());
+
+			ObjectNode transactions = new ObjectMapper().createObjectNode();
+			transactions.put("accountIban", accountIban);
+			ArrayNode transactionList = transactions.putArray("transactionList");
+			filteredTransactions.forEach(t -> {
+				ObjectNode transaction = new ObjectMapper().createObjectNode();
+				transaction.put("otherAccountIban", t.getOtherAccountIban());
+				transaction.put("amount", t.getAmount());
+				transaction.put("timeStamp", t.getTimeStamp().toString());
+				transaction.put("type", t.getType().name());
+				transaction.put("result", t.getResult().name());
+				transactionList.add(transaction);
+			});
+			return new ResponseEntity<>(transactions, HttpStatus.OK);
+		} else {
+			return ResponseEntity.status(403).build();
+		}
 	}
 }

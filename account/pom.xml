@@ -40,7 +40,12 @@
 		<dependency>
 			<groupId>com.bisnode.opa</groupId>
 			<artifactId>opa-java-client</artifactId>
-			<version>0.2.0</version>
+			<version>0.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>3.18.2</version>
 		</dependency>
 
 		<dependency>
@@ -48,6 +53,7 @@
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

@@ -32,27 +32,13 @@ public class AccountService implements ApplicationRunner {
 		return OpaClient.builder().opaConfiguration("http://localhost:8181").build();
 	}
 
-	@Autowired
-	private AccountRepository accountRepository;
-
-	@Autowired
-	private AccountHolderRepository accountHolderRepository;
-
-	@Autowired
-	private TransactionRepository transactionRepository;
+	@Bean
+	public MockData mockData() {
+		return new MockData();
+	}
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		log.info("Creating test data");
-		AccountHolder adamSandor = accountHolderRepository.save(new AccountHolder("Adam Sandor", "Borgerstraat 143B, Amsterdam"));
-		Account account1 = accountRepository.save(new Account("NL12345435345435345", adamSandor, "EU"));
-		Account account2 = accountRepository.save(new Account("NL12345435345444444", adamSandor, "EU"));
-		transactionRepository.save(new Transaction("SK54354656343444", 135.2, account1, Instant.now(), OUTGOING));
-		transactionRepository.save(new Transaction("SK54354656343444", 115.5, account1, Instant.now(), OUTGOING));
-		transactionRepository.save(new Transaction("SK54354656343444",  35.0, account1, Instant.now(), OUTGOING));
-		transactionRepository.save(new Transaction("SK54354656343444",  900.5, account1, Instant.now(), OUTGOING));
-		transactionRepository.save(new Transaction("SK54354656343444",  122.1, account1, Instant.now(), OUTGOING));
-		transactionRepository.save(new Transaction("SK54354656343444",  135.2, account1, Instant.now(), OUTGOING));
-		transactionRepository.save(new Transaction("SK54354656343444",  135.2, account1, Instant.now(), OUTGOING));
+		mockData().initialize();
 	}
 }

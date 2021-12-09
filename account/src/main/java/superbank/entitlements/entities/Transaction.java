@@ -18,15 +18,17 @@ public class Transaction {
     private Account account;
     private Instant timeStamp;
     private TransactionType type;
+    private TransactionResult result;
 
     protected Transaction() {}
 
-    public Transaction(String otherAccountIban, Double amount, Account account, Instant timeStamp, TransactionType type) {
+    public Transaction(String otherAccountIban, Double amount, Account account, Instant timeStamp, TransactionType type, TransactionResult result) {
         this.otherAccountIban = otherAccountIban;
         this.amount = amount;
         this.account = account;
         this.timeStamp = timeStamp;
         this.type = type;
+        this.result = result;
     }
 
     public Long getId() {
@@ -47,6 +49,10 @@ public class Transaction {
 
     public Account getAccount() {
         return account;
+    }
+
+    public TransactionResult getResult() {
+        return result;
     }
 
     @Override

@@ -52,20 +52,20 @@ class AccountController {
 	ResponseEntity<Account> accountStatus(@PathVariable(name = "accountIban") String accountIban,
 										  @RequestHeader(name = "Authorization") String authHeader) {
 		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
-		if (StringUtils.equals(jwt.getClaim("role").asString(), "customer_support") &&
-			jwt.getClaim("role_level").asInt() >= 1) {
-			Optional<Account> account = accountRepository.findAccountByIban(accountIban);
-			if (account.isPresent()) {
-				if (account.get().getGeoRegion().equals(jwt.getClaim("geo_region").asString())) {
-					return new ResponseEntity<>(account.get(), HttpStatus.OK);
-				} else {
-					return ResponseEntity.status(403).build();
-				}
+		if (!StringUtils.equals(jwt.getClaim("role").asString(), "customer_support")
+			|| jwt.getClaim("role_level").asInt() < 1) {
+			return ResponseEntity.status(403).build();
+		}
+
+		Optional<Account> account = accountRepository.findAccountByIban(accountIban);
+		if (account.isPresent()) {
+			if (account.get().getGeoRegion().equals(jwt.getClaim("geo_region").asString())) {
+				return new ResponseEntity<>(account.get(), HttpStatus.OK);
 			} else {
-				return ResponseEntity.notFound().build();
+				return ResponseEntity.status(403).build();
 			}
 		} else {
-			return ResponseEntity.status(403).build();
+			return ResponseEntity.notFound().build();
 		}
 	}
 

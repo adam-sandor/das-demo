@@ -56,7 +56,11 @@ class AccountController {
 			jwt.getClaim("role_level").asInt() >= 1) {
 			Optional<Account> account = accountRepository.findAccountByIban(accountIban);
 			if (account.isPresent()) {
-				return new ResponseEntity<>(account.get(), HttpStatus.OK);
+				if (account.get().getGeoRegion().equals(jwt.getClaim("geo_region").asString())) {
+					return new ResponseEntity<>(account.get(), HttpStatus.OK);
+				} else {
+					return ResponseEntity.status(403).build();
+				}
 			} else {
 				return ResponseEntity.notFound().build();
 			}
@@ -69,32 +73,48 @@ class AccountController {
 	ResponseEntity<ObjectNode> accountTransactions(@PathVariable(name = "accountIban") String accountIban,
 												   @RequestHeader(name = "Authorization") String authHeader) {
 		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
-		if (StringUtils.equals(jwt.getClaim("role").asString(), "customer_support")) {
-			List<Transaction> dbTransactions = transactionRepository.findAllByAccountIban(accountIban, Sort.by(Sort.Direction.DESC, "timeStamp"));
+		Optional<Account> account = accountRepository.findAccountByIban(accountIban);
 
-			List<Transaction> filteredTransactions = dbTransactions.stream().filter(t -> {
-				if (jwt.getClaim("role_level").asInt() < 3) {
-					return t.getResult() != TransactionResult.SUCCESS;
-				} else {
-					return true;
-				}
-			}).collect(Collectors.toList());
-
-			ObjectNode transactions = new ObjectMapper().createObjectNode();
-			transactions.put("accountIban", accountIban);
-			ArrayNode transactionList = transactions.putArray("transactionList");
-			filteredTransactions.forEach(t -> {
-				ObjectNode transaction = new ObjectMapper().createObjectNode();
-				transaction.put("otherAccountIban", t.getOtherAccountIban());
-				transaction.put("amount", t.getAmount());
-				transaction.put("timeStamp", t.getTimeStamp().toString());
-				transaction.put("type", t.getType().name());
-				transaction.put("result", t.getResult().name());
-				transactionList.add(transaction);
-			});
-			return new ResponseEntity<>(transactions, HttpStatus.OK);
+		if (account.isPresent()) {
+			if (!account.get().getGeoRegion().equals(jwt.getClaim("geo_region").asString())) {
+				return ResponseEntity.status(403).body(errorNode("Account GEO_REGION doesn't match Support User's GEO_REGION"));
+			}
 		} else {
+			return ResponseEntity.status(404).body(errorNode("Account " + accountIban + " not found"));
+		}
+
+		if (!StringUtils.equals(jwt.getClaim("role").asString(), "customer_support")) {
 			return ResponseEntity.status(403).build();
 		}
+
+        List<Transaction> dbTransactions = transactionRepository.findAllByAccountIban(accountIban, Sort.by(Sort.Direction.DESC, "timeStamp"));
+
+        List<Transaction> filteredTransactions = dbTransactions.stream().filter(t -> {
+            if (jwt.getClaim("role_level").asInt() < 3) {
+                return t.getResult() != TransactionResult.SUCCESS;
+            } else {
+                return true;
+            }
+        }).collect(Collectors.toList());
+
+        ObjectNode transactions = new ObjectMapper().createObjectNode();
+        transactions.put("accountIban", accountIban);
+        ArrayNode transactionList = transactions.putArray("transactionList");
+        filteredTransactions.forEach(t -> {
+            ObjectNode transaction = new ObjectMapper().createObjectNode();
+            transaction.put("otherAccountIban", t.getOtherAccountIban());
+            transaction.put("amount", t.getAmount());
+            transaction.put("timeStamp", t.getTimeStamp().toString());
+            transaction.put("type", t.getType().name());
+            transaction.put("result", t.getResult().name());
+            transactionList.add(transaction);
+        });
+        return new ResponseEntity<>(transactions, HttpStatus.OK);
+	}
+
+	private static ObjectNode errorNode(String error) {
+		ObjectNode node = new ObjectMapper().createObjectNode();
+		node.put("message", error);
+		return node;
 	}
 }

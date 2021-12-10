@@ -1,9 +1,21 @@
 package policy.ingress
 
-# Add policy/rules to allow or deny ingress traffic
+import input.attributes.request as request
 
-allow = true
+default allow = false
+
+jwt := payload {
+  [_, payload, _] := io.jwt.decode(bearer_token)
+}
+
+bearer_token := t {
+  v := input.attributes.request.http.headers.authorization
+  startswith(v, "Bearer ")
+  t := substring(v, count("Bearer "), -1)
+}
 
 allow {
-  true
+  input.parsed_path = ["account", _, "status"]
+  jwt.role = "customer_support"
+  jwt.role_level >= 1
 }

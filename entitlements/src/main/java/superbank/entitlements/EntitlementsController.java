@@ -32,7 +32,7 @@ class EntitlementsController {
 		input.put("jwt", token);
 
 		ObjectNode results = opaClient.queryForDocument(new QueryForDocumentRequest(input, "entitlements"), ObjectNode.class);
-		return results.get("entitlements");
+		return results;
 	}
 
 

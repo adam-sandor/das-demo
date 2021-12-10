@@ -8,8 +8,8 @@ function readyFn() {
 }
 
 function entitlementsReady(data) {
-    if (!data.entitlements.includes('account/status')) {
-        $("#account-status").show()
+    if (!data.entitlements.includes('account/details')) {
+        $("#account-details").show()
     }
     if (!data.entitlements.includes('account/transactions')) {
         $("#account-transactions").show()
@@ -17,6 +17,7 @@ function entitlementsReady(data) {
     if (!data.entitlements.includes('account/modify')) {
         $("#account-modify").show()
     }
+    
 }
 
 function entitlementsCallError(data) {

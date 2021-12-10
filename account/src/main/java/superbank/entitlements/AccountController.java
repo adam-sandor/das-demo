@@ -39,8 +39,8 @@ class AccountController {
 		this.transactionRepository = transactionRepository;
 	}
 
-	@GetMapping("/account/{accountIban}/status")
-	ResponseEntity<Account> accountStatus(@PathVariable(name = "accountIban") String accountIban,
+	@GetMapping("/account/{accountIban}/details")
+	ResponseEntity<Account> accountDetails(@PathVariable(name = "accountIban") String accountIban,
 										  @RequestHeader(name = "Authorization") String authHeader) {
 		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
 		if (!StringUtils.equals(jwt.getClaim("role").asString(), "customer_support")

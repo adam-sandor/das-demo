@@ -43,8 +43,8 @@ class AccountControllerWithOpa {
 		this.transactionRepository = transactionRepository;
 	}
 
-	@GetMapping("/account/v2/{accountIban}/status")
-	ResponseEntity<Account> accountStatus(@PathVariable(name = "accountIban") String accountIban,
+	@GetMapping("/account/v2/{accountIban}/details")
+	ResponseEntity<Account> accountDetails(@PathVariable(name = "accountIban") String accountIban,
 										  @RequestHeader(name = "Authorization") String authHeader) {
 		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
 		Optional<Account> account = accountRepository.findAccountByIban(accountIban);

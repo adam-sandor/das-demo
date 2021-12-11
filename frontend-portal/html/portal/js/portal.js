@@ -8,13 +8,13 @@ function readyFn() {
 }
 
 function entitlementsReady(data) {
-    if (!data.entitlements.includes('account/details')) {
+    if (data.entitlements.includes('account/details')) {
         $("#account-details").show()
     }
-    if (!data.entitlements.includes('account/transactions')) {
+    if (data.entitlements.includes('account/transactions')) {
         $("#account-transactions").show()
     }
-    if (!data.entitlements.includes('account/modify')) {
+    if (data.entitlements.includes('account/modify')) {
         $("#account-modify").show()
     }
     $('#user-full-name').text(data.subject.fullname);

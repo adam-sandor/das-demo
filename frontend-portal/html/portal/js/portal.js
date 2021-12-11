@@ -17,7 +17,10 @@ function entitlementsReady(data) {
     if (!data.entitlements.includes('account/modify')) {
         $("#account-modify").show()
     }
-    
+    $('#user-full-name').text(data.subject.fullname);
+    $('#user-role').text(data.subject.role);
+    $('#user-role-level').text("Level " + data.subject.role_level);
+    $('#user-geo-region').text(data.subject.geo_region);
 }
 
 function entitlementsCallError(data) {

@@ -17,7 +17,7 @@ spec:
         - name: entitlements
           image: europe-west4-docker.pkg.dev/adam-playground-315708/microservice-demo/entitlements:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
           imagePullPolicy: Always
         - name: opa
           args:
@@ -48,5 +48,5 @@ spec:
   ports:
     - name: http
       port: 80
-      targetPort: 8080
+      targetPort: 8081
   type: ClusterIP

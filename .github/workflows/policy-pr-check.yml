@@ -17,9 +17,9 @@ jobs:
       - name: Configure Styra CLI
         env:
           STYRA_API_TOKEN: ${{ secrets.ADAMSANDOR_DAS_API_TOKEN }}
-          STYRA_CLI_URL: https://adamsandor.svc.styra.com/v1/docs/bin/linux/amd64/styra
+          STYRA_CLI_URL: https://docs.styra.com/bin/linux/amd64/styra
         run: |
-          curl -s -H "Authorization: Bearer ${STYRA_API_TOKEN}" -o styra ${STYRA_CLI_URL}
+          curl -s -o styra ${STYRA_CLI_URL}
           mv styra /usr/local/bin/styra
           chmod +x /usr/local/bin/styra
           styra configure -i https://adamsandor.svc.styra.com -t ${STYRA_API_TOKEN}
@@ -27,11 +27,12 @@ jobs:
         id: replay
         working-directory: policy
         run: |
+          set -x
           mkdir ../replay-results
           echo "Replaying decision logs for JWT library change on Gateway System"
           styra validate logreplay -p global/jwt=library/global/jwt/jwt.rego --system=dc105efba51d4f59b419d3979d8ae0e6 -o json > ../replay-results/replay-result1.json
           echo "Replaying decision logs for changes in Entitlements System"
-          styra validate logreplay -p entitlements=system/entitlements/entitlements.rego --system=fca9a74811204ea6b1d812f115cede2f -o json > ../replay-results/replay-result2.json
+          styra validate logreplay -p entitlements=system/entitlements/entitlements.rego --system=fca9a74811204ea6b1d812f115cede2f -o json
           cat ../replay-results/replay-result1.json
           echo "------"
           cat ../replay-results/replay-result2.json

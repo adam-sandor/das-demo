@@ -75,8 +75,8 @@
 					<h1 class="panel-title"><span class="glyphicon glyphicon-random"></span> Last Viewed Accounts</h1>
 				</div>
 				<div class="list-group">
-					<a href="#" class="list-group-item">NL12345435345435345</a>
-					<a href="#" class="list-group-item">NL12345435345444444</a>
+					<div class="list-group-item">NL12345435345435345</div>
+					<div class="list-group-item">NL12345435345444444</div>
 				</div>
 			</div>
 				
@@ -93,52 +93,24 @@
 			</div>		
 		
 			<!-- Articles -->
-			<div class="row" id="account-details" style="display: none">
+			<div class="row">
 				<div class="col-xs-12">
-					<h2>Check Account Status</h2>
+					<h2>Account Operations</h2>
 					<p class="result"></p>
 					<div class="panel-body">
-						<form>
+						<div>
 							<div class="form-group">
-								<input type="text" class="form-control" id="accountId-status" name="accountId" placeholder="Account ID">
+								<input type="text" class="form-control" id="account-iban-input" name="accountId" placeholder="Account ID">
 							</div>
-							<button type="submit" class="btn btn-default">Search</button>
-						</form>
+							<button id="account-details" style="display: none" class="btn btn-default">Details</button>
+							<button id="account-transactions" style="display: none" class="btn btn-default">Transactions</button>
+							<button id="account-block" style="display: none" class="btn btn-default">Block</button>
+						</div>
+						<hr>
+						<div id="data-table"></div>
 					</div>
 				</div>
 			</div>
-			<hr>
-			<div class="row" id="account-transactions" style="display: none">
-				<div class="col-xs-12">
-					<h2>List Account Transactions</h2>
-					<p class="results"></p>
-					<div class="panel-body">
-						<form>
-							<div class="form-group">
-								<input type="text" class="form-control" id="accountId-transactions" name="accountId" placeholder="Account ID">
-							</div>
-							<button type="submit" class="btn btn-default">Search</button>
-						</form>
-					</div>
-				</div>
-			</div>
-			<hr>
-			<div class="row" id="account-modify" style="display: none">
-				<div class="col-xs-12">
-					<h2>Modify Account Data</h2>
-					<div class="panel-body">
-						<form>
-							<div class="form-group">
-								<label for="accountId-modify">AccountId:</label><input type="text" class="form-control" id="accountId-modify" name="accountId-modify" placeholder="Account ID">
-								<label for="modify-owner">Owner:</label><input type="text" class="form-control" id="modify-owner" name="modify-owner" placeholder="John Doe">
-								<label for="modify-email">Associated Email Address:</label><input type="text" class="form-control" id="modify-email" name="modify-email" placeholder="johndoe@email.com">
-							</div>
-							<button type="submit" class="btn btn-default">Save</button>
-						</form>
-					</div>
-				</div>
-			</div>
-			<hr>
 		</div><!--/Center Column-->
 
 
@@ -203,33 +175,13 @@
 	
 	<footer>
 		<div class="footer-blurb">
-			<div class="container">
-				<div class="row">
-					<div class="col-sm-3 footer-blurb-item">
-						<h3><span class="glyphicon glyphicon-text-size"></span> Dynamic</h3>
-						<p>Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.</p>
-						<p><a class="btn btn-default" href="#">Procrastinate</a></p>
-					</div>
-					<div class="col-sm-3 footer-blurb-item">
-						<h3><span class="glyphicon glyphicon-wrench"></span> Efficient</h3>
-						<p>Dramatically maintain clicks-and-mortar solutions without functional solutions. Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. </p>
-						<p><a class="btn btn-default" href="#">Unleash</a></p>
-					</div>
-					<div class="col-sm-3 footer-blurb-item">
-						<h3><span class="glyphicon glyphicon-paperclip"></span> Complete</h3>
-						<p>Professionally cultivate one-to-one customer service with robust ideas. Completely synergize resource taxing relationships via premier niche markets. Dynamically innovate resource-leveling customer service for state of the art customer service.</p>
-						<p><a class="btn btn-default" href="#">Complete</a></p>
-					</div>
 
-				</div>
-				<!-- /.row -->	
-			</div>
         </div>
 
         <div class="small-print">
         	<div class="container">
         		<p><a href="#">Terms &amp; Conditions</a> | <a href="#">Privacy Policy</a> | <a href="#">Contact</a></p>
-        		<p>Copyright &copy; Example.com 2015 </p>
+        		<p>Copyright &copy; Styra.com 2021 </p>
         	</div>
         </div>
 	</footer>

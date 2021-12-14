@@ -21,6 +21,15 @@ function entitlementsReady(data) {
     $('#user-role').text(data.subject.role);
     $('#user-role-level').text("Level " + data.subject.role_level);
     $('#user-geo-region').text(data.subject.geo_region);
+    if (data.subject.fullname === "Agent Brown") {
+        $('#agent-pic').attr('src','img/agent-brown.png')
+    }
+    if (data.subject.fullname === "Agent Smith") {
+        $('#agent-pic').attr('src','img/agent-smith.png')
+    }
+    if (data.subject.fullname === "Agent Jones") {
+        $('#agent-pic').attr('src', 'img/agent-jones.png')
+    }
 }
 
 function entitlementsCallError(data) {

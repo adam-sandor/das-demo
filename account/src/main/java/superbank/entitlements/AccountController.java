@@ -43,6 +43,7 @@ class AccountController {
 	ResponseEntity<Account> accountDetails(@PathVariable(name = "accountIban") String accountIban,
 										  @RequestHeader(name = "Authorization") String authHeader) {
 		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
+		//CS Level 1 and above can see account details
 		if (!StringUtils.equals(jwt.getClaim("role").asString(), "customer_support")
 			|| jwt.getClaim("role_level").asInt() < 1) {
 			return ResponseEntity.status(403).build();
@@ -50,6 +51,7 @@ class AccountController {
 
 		Optional<Account> account = accountRepository.findAccountByIban(accountIban);
 		if (account.isPresent()) {
+			//CS of any level can only see accounts from their assigned geographic region
 			if (account.get().getGeoRegion().equals(jwt.getClaim("geo_region").asString())) {
 				return new ResponseEntity<>(account.get(), HttpStatus.OK);
 			} else {
@@ -80,8 +82,10 @@ class AccountController {
 
         List<Transaction> dbTransactions = transactionRepository.findAllByAccountIban(accountIban, Sort.by(Sort.Direction.DESC, "timeStamp"));
 
+		//CS Level 2 can see failed transactions
+		//CS Level 3 can see all transactions
         List<Transaction> filteredTransactions = dbTransactions.stream().filter(t -> {
-            if (jwt.getClaim("role_level").asInt() < 3) {
+            if (jwt.getClaim("role_level").asInt() == 2) {
                 return t.getResult() != TransactionResult.SUCCESS;
             } else {
                 return true;

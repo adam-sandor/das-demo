@@ -1,4 +1,4 @@
-## Styra CLI in GH actions
+# Styra CLI in GH actions
 
 The `styra/cli` image doesn't have bash in it and that trips up GH actions:
 
@@ -21,7 +21,7 @@ obs:
           args: styra validate logreplay -p global/jwt=library/global/jwt/jwt.rego --system=dc105efba51d4f59b419d3979d8ae0e6
 ```
 
-```
+```text
 [Verify Pull Request/build] 🚀  Start image=styra/cli
 [Verify Pull Request/build]   🐳  docker run image=styra/cli platform=linux/amd64 entrypoint=["/usr/bin/tail" "-f" "/dev/null"] cmd=[]
 [Verify Pull Request/build]   🐳  docker exec cmd=[mkdir -m 0777 -p /var/run/act] user=root
@@ -36,6 +36,7 @@ obs:
 ```
 
 Adding `sh` as default shell is causing a weird runtime issue
+
 ```yaml
 jobs:
   build:
@@ -46,7 +47,7 @@ jobs:
         shell: sh
 ```
 
-```
+```text
 [Verify Pull Request/build]   🐳  docker exec cmd=[mkdir -p /Users/adam/Projects/das-webinar] user=
 [Verify Pull Request/build] ⭐  Run actions/checkout@v2
 [Verify Pull Request/build]   ✅  Success - actions/checkout@v2
@@ -57,7 +58,7 @@ jobs:
 
 When running on GH directly instead of Act I'm getting this error too:
 
-```
+```text
 Run actions/checkout@v2
 /usr/bin/docker exec  31e9255d265de3879d8702124a6a39057ba3f0f4b62f059ddb1d59593090b06c sh -c "cat /etc/*release | grep ^ID"
 Syncing repository: adam-sandor/das-demo

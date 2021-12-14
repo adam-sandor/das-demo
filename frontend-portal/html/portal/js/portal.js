@@ -15,7 +15,7 @@ function entitlementsReady(data) {
         $("#account-transactions").show()
     }
     if (data.entitlements.includes('account/block')) {
-        $("#account-modify").show()
+        $("#account-block").show()
     }
     $('#user-full-name').text(data.subject.fullname);
     $('#user-role').text(data.subject.role);
@@ -61,7 +61,7 @@ $('#account-details').click(function () {
     }
     $.ajax({
         type: "GET",
-        url: "/account/" + $('#account-iban-input').val() + "/details",
+        url: accountServiceUrl() + $('#account-iban-input').val() + "/details",
         success: ready,
         error: error
     })
@@ -104,11 +104,19 @@ $('#account-transactions').click(function () {
     }
     $.ajax({
         type: "GET",
-        url: "/account/" + $('#account-iban-input').val() + "/transactions",
+        url: accountServiceUrl() + $('#account-iban-input').val() + "/transactions",
         success: ready,
         error: error
     })
 });
+
+function accountServiceUrl() {
+    if (window.location.hash === '#opa-enabled') {
+        return '/account/v2/'
+    } else {
+        return '/account/'
+    }
+}
 
 $(readyFn)
 

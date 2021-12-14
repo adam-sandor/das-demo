@@ -87,7 +87,10 @@ class AccountControllerWithOpa {
 		if (opaResult.get("deny").size() > 0) {
 			return ResponseEntity.status(403).body(opaResult.get("deny"));
 		} else {
-			return ResponseEntity.ok(opaResult.get("transactions"));
+			ObjectNode response = new ObjectMapper().createObjectNode();
+			response.put("accountIban", accountIban);
+			response.set("transactionList", opaResult.get("transactions"));
+			return ResponseEntity.ok(response);
 		}
 	}
 

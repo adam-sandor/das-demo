@@ -87,9 +87,11 @@ class AccountController {
         List<Transaction> filteredTransactions = dbTransactions.stream().filter(t -> {
             if (jwt.getClaim("role_level").asInt() == 2) {
                 return t.getResult() != TransactionResult.SUCCESS;
-            } else {
+            } else if (jwt.getClaim("role_level").asInt() == 3) {
                 return true;
-            }
+            } else {
+				return false;
+			}
         }).collect(Collectors.toList());
 
         ObjectNode transactions = new ObjectMapper().createObjectNode();

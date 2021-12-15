@@ -15,7 +15,26 @@ bearer_token := t {
 }
 
 allow {
-  input.parsed_path = ["account", _, "status"]
+  input.parsed_path[0] = "account"
+  input.parsed_path[count(input.parsed_path) - 1] = "details"
   jwt.role = "customer_support"
   jwt.role_level >= 1
+}
+
+allow {
+  input.parsed_path[0] = "account"
+  input.parsed_path[count(input.parsed_path) - 1] = "transactions"
+  jwt.role = "customer_support"
+  jwt.role_level >= 2
+}
+
+allow {
+  input.parsed_path[0] = "account"
+  input.parsed_path[count(input.parsed_path) - 1] = "block"
+  jwt.role = "customer_support"
+  jwt.role_level >= 3
+}
+
+allow {
+  input.parsed_path[0] == "portal"
 }

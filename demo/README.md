@@ -36,5 +36,6 @@ curl -H "Authorization: Bearer $(cat cs-level-2.jwt)" "http://${INGRESS}/entitle
 curl -H "Authorization: Bearer $(cat cs-level-2.jwt)" "http://${INGRESS}/entitlements"
 
 # List transactions
+curl -H "Authorization: Bearer $(cat cs-level-2.jwt)" http://${INGRESS}/account/NL12345435345435345/details | jq .
 curl -H "Authorization: Bearer $(cat cs-level-2.jwt)" http://${INGRESS}/account/NL12345435345435345/transactions | jq .
 ```

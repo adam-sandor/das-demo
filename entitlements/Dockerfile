@@ -5,5 +5,5 @@ RUN mvn package
 
 FROM adoptopenjdk:16
 WORKDIR /app
-COPY --from=0 /build/target/account.jar /app
-CMD ["java", "-jar", "account.jar"]
+COPY --from=0 /build/target/entitlements.jar /app
+CMD ["java", "-jar", "entitlements.jar"]

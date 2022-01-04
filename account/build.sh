@@ -1,2 +1,4 @@
-mvn package jib:dockerBuild
-docker push europe-west4-docker.pkg.dev/adam-playground-315708/microservice-demo/account
+# Build using multi-stage Dockerfile
+# Output: account:latest docker image
+# Requires: Docker
+docker build -t account:latest .

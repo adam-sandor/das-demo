@@ -17,7 +17,6 @@
 
 	<properties>
 		<java.version>16</java.version>
-		<image.repo>europe-west4-docker.pkg.dev/adam-playground-315708/microservice-demo</image.repo>
 	</properties>
 
 	<dependencies>
@@ -82,6 +81,9 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<finalName>account-service</finalName>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>com.google.cloud.tools</groupId>
@@ -89,20 +91,12 @@
 				<version>3.1.4</version>
 				<configuration>
 					<to>
-						<image>${image.repo}/${project.artifactId}:latest</image>
+						<image>account:latest</image>
 					</to>
 					<from>
 						<image>openjdk:16.0.1</image>
 					</from>
 				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>build</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

@@ -15,9 +15,8 @@ jobs:
       - name: Configure Styra CLI
         env:
           STYRA_API_TOKEN: ${{ secrets.ADAMSANDOR_DAS_API_TOKEN }}
-          STYRA_CLI_URL: https://docs.styra.com/bin/linux/amd64/styra
         run: |
-          curl -s -o styra ${STYRA_CLI_URL}
+          curl -s -o styra https://docs.styra.com/bin/linux/amd64/styra
           mv styra /usr/local/bin/styra
           chmod +x /usr/local/bin/styra
           styra configure -i https://adamsandor.svc.styra.com -t ${STYRA_API_TOKEN}

@@ -1,0 +1,170 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: entitlements-sa
+  labels:
+    app.kubernetes.io/component: entitlements
+    app.kubernetes.io/name: banking-demo
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: entitlements-svc
+  labels:
+    app.kubernetes.io/component: entitlements
+    app.kubernetes.io/name: banking-demo
+spec:
+  selector:
+    app.kubernetes.io/component: entitlements
+    app.kubernetes.io/name: banking-demo
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8081
+  type: ClusterIP
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: entitlements-vs
+  labels:
+    app.kubernetes.io/component: entitlements
+    app.kubernetes.io/name: banking-demo
+spec:
+  hosts:
+    - banking-demo.styra-sa.com
+  gateways:
+    - banking-demo-gw
+  http:
+    - match:
+        - uri:
+            prefix: /entitlements
+      route:
+        - destination:
+            port:
+              number: 80
+            host: entitlements-svc
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: entitlements-deploy
+  labels:
+    app.kubernetes.io/component: entitlements
+    app.kubernetes.io/name: banking-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: entitlements
+      app.kubernetes.io/name: banking-demo
+  template:
+    metadata:
+      labels:
+        opa-istio-authz: "false"
+        # sidecar.istio.io/inject: "false"
+        app.kubernetes.io/component: entitlements
+        app.kubernetes.io/name: banking-demo
+    spec:
+      serviceAccountName: entitlements-sa
+      hostPID: false
+      hostIPC: false
+      hostNetwork: false
+      # securityContext:
+      #   runAsUser: 1000
+      #   runAsGroup: 100
+
+      containers:
+        - name: entitlements
+          image: adamsandor83/entitlements:latest
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            # runAsNonRoot: true
+            # runAsUser: 1000
+            # runAsGroup: 1000
+            capabilities:
+              drop:
+                - all
+          ports:
+            - containerPort: 8081
+          # livenessProbe:
+          #   httpGet:
+          #     path: /health
+          #     scheme: HTTP
+          #     port: 8282
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 5
+          # readinessProbe:
+          #   httpGet:
+          #     path: /health?bundle=true
+          #     scheme: HTTP
+          #     port: 8282
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 5
+          # resources:
+          # limits:
+          #   cpu: 100m 
+          #   memory: 256Mi
+          # requests:
+          #   cpu: 100m
+          #   memory: 256Mi
+          
+        - name: opa
+          image: openpolicyagent/opa:0.35.0-rootless
+          imagePullPolicy: Always
+          args:
+            - "run"
+            - "--server"
+            - "--ignore=.*"
+            - "--config-file=/config/opa.yaml"
+            - "--addr=http://127.0.0.1:8181"
+            - "--diagnostic-addr=0.0.0.0:8282"
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            # readOnlyRootFilesystem: true
+            # runAsNonRoot: true
+            # runAsUser: 1000
+            # runAsGroup: 1000
+            capabilities:
+              drop:
+                - all
+          volumeMounts:
+            - readOnly: true
+              mountPath: /config/opa.yaml
+              subPath: opa.yaml
+              name: opa-config-vol
+          livenessProbe:
+            httpGet:
+              path: /health
+              scheme: HTTP
+              port: 8282
+            initialDelaySeconds: 5      # Tune these periods for your environemnt
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health?bundle=true  # Include bundle activation in readiness
+              scheme: HTTP
+              port: 8282
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          
+          # resources:
+          # limits:
+          #   cpu: 100m 
+          #   memory: 256Mi
+          # requests:
+          #   cpu: 100m
+          #   memory: 256Mi
+          
+      volumes:
+        - name: opa-config-vol
+          configMap:
+            name: entitlements-opa-config-cm

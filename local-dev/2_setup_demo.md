@@ -173,5 +173,5 @@ kubectl apply -f $YAML_DIR/portal-deploy.yaml
 kubectl apply -f $YAML_DIR/istio-gateway.yaml
 
 # mTLS
-kubectl apply -f $YAML_DIR/istio-global-mtls.yaml
+kubectl apply -f $YAML_DIR/istio-mtls-cluster-strict.yaml
 ```

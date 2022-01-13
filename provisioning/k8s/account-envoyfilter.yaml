@@ -5,7 +5,7 @@ metadata:
 spec:
   workloadSelector:
     labels:
-      opa-istio-authz: "yes"
+      opa-istio-authz: "true"
   configPatches:
     - applyTo: HTTP_FILTER
       match:
@@ -50,10 +50,10 @@ spec:
           typed_config:
             "@type": type.googleapis.com/envoy.extensions.filters.http.header_to_metadata.v3.Config
             request_rules:
-              - header: x-opa-authz
-                on_header_missing:
-                  key: 'policy_type'
-                  value: 'ingress'
+            - header: x-opa-authz
+              on_header_missing:
+                key: 'policy_type'
+                value: 'ingress'
     - applyTo: HTTP_FILTER
       match:
         context: SIDECAR_OUTBOUND
@@ -99,7 +99,7 @@ spec:
           typed_config:
             "@type": type.googleapis.com/envoy.extensions.filters.http.header_to_metadata.v3.Config
             request_rules:
-              - header: x-opa-authz
-                on_header_missing:
-                  key: 'policy_type'
-                  value: 'egress'
+            - header: x-opa-authz
+              on_header_missing:
+                key: 'policy_type'
+                value: 'egress'

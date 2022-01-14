@@ -6,3 +6,7 @@
 config
 target
 .DS_Store
+
+.env
+/provisioning/k8s/certs
+entitlements-opa-conf-cm.yaml

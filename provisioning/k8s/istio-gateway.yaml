@@ -1,49 +1,27 @@
+---
 apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
-  name: banking-demo
+  name: banking-demo-gw
+  labels:
+    app.kubernetes.io/component: istio
+    app.kubernetes.io/name: banking-demo
 spec:
   selector:
-    istio: ingressgateway # use Istio default gateway implementation
+    istio: ingressgateway
   servers:
-    - port:
-        number: 80
-        name: http
-        protocol: HTTP
-      hosts:
-        - banking-demo.styra-sa.com
----
-apiVersion: networking.istio.io/v1beta1
-kind: VirtualService
-metadata:
-  name: banking-demo
-spec:
-  hosts:
-    - banking-demo.styra-sa.com
-  gateways:
-    - banking-demo
-  http:
-    - match:
-        - uri:
-            prefix: /portal
-      route:
-        - destination:
-            port:
-              number: 80
-            host: portal
-    - match:
-        - uri:
-            prefix: /account
-      route:
-        - destination:
-            port:
-              number: 80
-            host: account
-    - match:
-        - uri:
-            prefix: /entitlements
-      route:
-        - destination:
-            port:
-              number: 80
-            host: entitlements
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*.styra-sa.com"
+  # - port:
+  #     number: 443
+  #     name: https
+  #     protocol: HTTPS
+  #   tls:
+  #     mode: SIMPLE
+  #     credentialName: styra-sa.com.certs
+  #   hosts:
+  #   - "*.styra-sa.com"

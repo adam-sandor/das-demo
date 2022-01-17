@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# delete git secret
-curl --request DELETE \
-  --url $DAS_TENANT/v1/secrets/$DAS_GIT_CREDENTIAL_NAME \
-  --header "Authorization: Bearer $DAS_WORKSPACE_TOKEN"
-
-
-
 # delete system banking_demo_account
 DAS_SYSTEM='banking_demo_account'
 DAS_SYSTEM_TYPE='template.istio:1.0'
@@ -62,3 +55,10 @@ curl --request DELETE \
   --url $DAS_TENANT/v1/datasources/global/$DAS_DATASOURCE \
   --header 'authorization: Bearer '$DAS_WORKSPACE_TOKEN'' \
   --header 'content-type: application/json'
+
+
+
+# delete git secret
+curl --request DELETE \
+  --url $DAS_TENANT/v1/secrets/$DAS_GIT_CREDENTIAL_NAME \
+  --header "Authorization: Bearer $DAS_WORKSPACE_TOKEN"

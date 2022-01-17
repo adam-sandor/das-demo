@@ -3,8 +3,7 @@
 # delete git secret
 curl --request DELETE \
   --url $DAS_TENANT/v1/secrets/$DAS_GIT_CREDENTIAL_NAME \
-  --header "Authorization: Bearer $DAS_WORKSPACE_TOKEN" \
-  --header 'Content-Type: application/json'
+  --header "Authorization: Bearer $DAS_WORKSPACE_TOKEN"
 
 
 

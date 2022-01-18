@@ -54,6 +54,26 @@ curl --request POST \
         "reference": "'$GIT_REFERENCE'",
       "url": "'$GIT_URL'"
       }
+    },
+    "decision_mappings": {
+      "entitlements": {
+        "allowed": {
+          "path": "result.allowed",
+          "negated": false,
+          "expected": null
+        },
+        "reason": null,
+        "columns": null
+      },
+      "entitlements/allowed": {
+        "allowed": {
+          "path": "result",
+          "negated": false,
+          "expected": null
+        },
+        "reason": null,
+        "columns": null
+      }
     }
   }'
 

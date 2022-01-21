@@ -35,9 +35,9 @@ metadata:
     app.kubernetes.io/name: banking-demo
 spec:
   hosts:
-    - banking-demo.styra-sa.com
+    - banking.styra-demo.com
   gateways:
-    - banking-demo-gw
+    - istio-system/banking-demo-gw
   http:
     - match:
         - uri:
@@ -81,7 +81,7 @@ spec:
       containers:
         - name: portal
           image: adamsandor83/portal:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
             privileged: false
@@ -124,7 +124,7 @@ spec:
           
         - name: opa
           image: openpolicyagent/opa:0.34.2-envoy-rootless
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           args:
             - "run"
             - "--server"

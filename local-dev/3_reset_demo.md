@@ -4,7 +4,7 @@
 
 ```bash
 # delete minikube cluster
-minikube delete
+minikube delete --profile $MINIKUBE_PROFILE
 
 # delete systems in DAS
 ./provisioning/das/purge.sh

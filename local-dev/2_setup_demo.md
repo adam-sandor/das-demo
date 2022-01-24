@@ -19,7 +19,9 @@ source .env
 # set MINIKUBE?DRIVER in your `.env` file
 
 minikube start \
+  --profile $MINIKUBE_PROFILE \
   --driver=$MINIKUBE_DRIVER \
+  --container-runtime=containerd \
   --cpus 3 \
   --memory=6144 \
   --extra-config=apiserver.enable-admission-plugins=MutatingAdmissionWebhook,ValidatingAdmissionWebhook
@@ -41,14 +43,14 @@ istioctl install --set profile=default -y
 # Run tunnel in a separate terminal
 # it will ask for a password
 
-minikube tunnel
+minikube tunnel --profile $MINIKUBE_PROFILE
 
 # Cleaning up orphaned routes
 # If the minikube tunnel shuts down in an abrupt manner, it may leave orphaned network routes on your system. 
 # If this happens, the ~/.minikube/tunnels.json file will contain an entry for that tunnel. 
 # To remove orphaned routes, run:
 
-minikube tunnel --cleanup
+minikube tunnel --profile $MINIKUBE_PROFILE --cleanup
 ```
 
 ### local routing
@@ -88,7 +90,8 @@ echo $INGRESS_HOST
 kubectl create namespace $K8S_NAMESPACE
 
 # edit context
-kubectl config set-context minikube --cluster=minikube --namespace=$K8S_NAMESPACE --user=minikube
+kubectl config set current-context $MINIKUBE_PROFILE
+kubectl config set-context $MINIKUBE_PROFILE --cluster=$MINIKUBE_PROFILE --namespace=$K8S_NAMESPACE --user=$MINIKUBE_PROFILE
 ```
 
 ### account

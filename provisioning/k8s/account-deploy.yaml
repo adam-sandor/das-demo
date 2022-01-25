@@ -81,7 +81,7 @@ spec:
       containers:
         - name: account
           image: adamsandor83/account:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
             privileged: false
@@ -118,7 +118,7 @@ spec:
           
         - name: opa
           image: openpolicyagent/opa:0.34.2-envoy-rootless
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           args:
             - "run"
             - "--server"

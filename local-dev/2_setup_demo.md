@@ -2,6 +2,8 @@
 
 ## prerequisites
 
+First create a .env file from the .env_template in the root of the repo and set all the requested parameters.
+
 ```bash
 # create copy of `.env_template`, name it `.env` and fill values
 # `.env` is listed in .gitignore

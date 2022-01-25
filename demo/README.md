@@ -11,9 +11,9 @@ curl -H "Authorization: Bearer $(cat cs-level-2.jwt)" localhost:8080/entitlement
 Request entitlements from OPA:
 
 ```shell
-curl -X POST -H "Content-Type:application/json" -d "{\"input\":{\"jwt\":\"$(cat cs-level-2.jwt)\"}}" localhost:8181/v1/data/entitlements
+curl -X POST -H "Content-Type:application/json" -d "{\"input\":{\"jwt\":\"$(cat cs-level-2-eu.jwt)\"}}" localhost:8181/v1/data/entitlements
 
-curl -X POST -H "Content-Type:application/json" -d "{\"input\":{\"jwt\":\"$(cat cs-level-2.jwt)\", \"action\": \"account/transactions\"}}" localhost:8181/v1/data/entitlements/allowed
+curl -X POST -H "Content-Type:application/json" -d "{\"input\":{\"jwt\":\"$(cat cs-level-2-eu.jwt)\", \"action\": \"account/transactions\"}}" localhost:8181/v1/data/entitlements/allowed
 ```
 
 ## Build
@@ -30,12 +30,12 @@ docker buildx build --platform linux/amd64 --push -t eu.gcr.io/adam-playground-3
 curl http://${INGRESS}/status/up
 
 curl http://${INGRESS}/status/details
-curl -H "Authorization: Bearer $(cat cs-level-2.jwt)" "http://${INGRESS}/status/details"
+curl -H "Authorization: Bearer $(cat cs-level-2-eu.jwt)" "http://${INGRESS}/status/details"
 
-curl -H "Authorization: Bearer $(cat cs-level-2.jwt)" "http://${INGRESS}/entitlements"
-curl -H "Authorization: Bearer $(cat cs-level-2.jwt)" "http://${INGRESS}/entitlements"
+curl -H "Authorization: Bearer $(cat cs-level-2-eu.jwt)" "http://${INGRESS}/entitlements"
+curl -H "Authorization: Bearer $(cat cs-level-2-eu.jwt)" "http://${INGRESS}/entitlements"
 
 # List transactions
-curl -H "Authorization: Bearer $(cat cs-level-2.jwt)" http://${INGRESS}/account/NL12345435345435345/details | jq .
-curl -H "Authorization: Bearer $(cat cs-level-2.jwt)" http://${INGRESS}/account/NL12345435345435345/transactions | jq .
+curl -H "Authorization: Bearer $(cat cs-level-2-eu.jwt)" http://${INGRESS}/account/NL12345435345435345/details | jq .
+curl -H "Authorization: Bearer $(cat cs-level-2-eu.jwt)" http://${INGRESS}/account/NL12345435345435345/transactions | jq .
 ```

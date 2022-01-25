@@ -17,7 +17,8 @@ source .unset_env
 
 ```bash
 # set context to namespace `default`
-kubectl config set-context minikube --cluster=minikube --namespace=default --user=minikube
+kubectl config set current-context $MINIKUBE_PROFILE
+kubectl config set-context $MINIKUBE_PROFILE --cluster=$MINIKUBE_PROFILE --namespace=default --user=$MINIKUBE_PROFILE
 
 # delete namespace
 kubectl delete namespace $K8S_NAMESPACE

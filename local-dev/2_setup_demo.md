@@ -19,7 +19,9 @@ source .env
 # set MINIKUBE?DRIVER in your `.env` file
 
 minikube start \
+  --profile $MINIKUBE_PROFILE \
   --driver=$MINIKUBE_DRIVER \
+  --container-runtime=containerd \
   --cpus 3 \
   --memory=6144 \
   --extra-config=apiserver.enable-admission-plugins=MutatingAdmissionWebhook,ValidatingAdmissionWebhook
@@ -41,14 +43,14 @@ istioctl install --set profile=default -y
 # Run tunnel in a separate terminal
 # it will ask for a password
 
-minikube tunnel
+minikube tunnel --profile $MINIKUBE_PROFILE
 
 # Cleaning up orphaned routes
 # If the minikube tunnel shuts down in an abrupt manner, it may leave orphaned network routes on your system. 
 # If this happens, the ~/.minikube/tunnels.json file will contain an entry for that tunnel. 
 # To remove orphaned routes, run:
 
-minikube tunnel --cleanup
+minikube tunnel --profile $MINIKUBE_PROFILE --cleanup
 ```
 
 ### local routing
@@ -60,7 +62,17 @@ echo $INGRESS_HOST
 
 # open the file `/etc/hosts` with your prefered editor (elevated permissions necessary) 
 # and add following line (use value instead of variable):
-<$INGRESS_HOST>       banking-demo.styra-sa.com
+<$INGRESS_HOST>       banking.styra-demo.com
+```
+
+## create certificates
+
+```bash
+# create certificates
+./provisioning/k8s/genCerts.sh
+
+# (optional)
+# import `styra-demo.com.crt` into chromes trust store
 ```
 
 ## load policies into DAS
@@ -74,18 +86,17 @@ echo $INGRESS_HOST
 ### create namespace
 
 ```bash
-K8S_NAMESPACE='banking-demo'
+# create namespace
 kubectl create namespace $K8S_NAMESPACE
 
 # edit context
-kubectl config set-context minikube --cluster=minikube --namespace=$K8S_NAMESPACE --user=minikube
+kubectl config set current-context $MINIKUBE_PROFILE
+kubectl config set-context $MINIKUBE_PROFILE --cluster=$MINIKUBE_PROFILE --namespace=$K8S_NAMESPACE --user=$MINIKUBE_PROFILE
 ```
 
 ### account
 
 ```bash
-YAML_DIR='provisioning/k8s'
-
 # get system ID for banking_demo_account
 DAS_SYSTEM='banking_demo_account'
 DAS_SYSTEM_TYPE='template.istio:1.0'
@@ -171,9 +182,20 @@ kubectl apply -f $YAML_DIR/portal-deploy.yaml
 ### configure istio
 
 ```bash
-# gateway
+# create gateway
 kubectl apply -f $YAML_DIR/istio-gateway.yaml
 
+# create secret
+kubectl create secret tls wildcard.styra-demo.com.certs \
+  -n istio-system \
+  --key=$YAML_DIR/certs/wildcard.styra-demo.com.key \
+  --cert=$YAML_DIR/certs/wildcard.styra-demo.com.crt
+
 # mTLS
-kubectl apply -f $YAML_DIR/istio-mtls-cluster-strict.yaml
+# does currently not work wince slp does not have a istio proxy, hence no mTLS
+# kubectl apply -f $YAML_DIR/istio-mtls-cluster-strict.yaml
 ```
+
+## access portal in browser
+
+<https://banking.styra-demo.com/portal>

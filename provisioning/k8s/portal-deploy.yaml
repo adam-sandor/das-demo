@@ -22,7 +22,7 @@ spec:
   ports:
     - name: http
       port: 80
-      targetPort: 80
+      targetPort: 8080
   type: ClusterIP
 
 ---
@@ -35,9 +35,9 @@ metadata:
     app.kubernetes.io/name: banking-demo
 spec:
   hosts:
-    - banking-demo.styra-sa.com
+    - banking.styra-demo.com
   gateways:
-    - banking-demo-gw
+    - istio-system/banking-demo-gw
   http:
     - match:
         - uri:
@@ -85,42 +85,29 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             privileged: false
-            # readOnlyRootFilesystem: true  # do not change
-            # runAsNonRoot: true
-            # runAsUser: 1000
-            # runAsGroup: 1000
+            readOnlyRootFilesystem: false  # do not change
+            runAsNonRoot: true
+            runAsUser: 101
+            runAsGroup: 101
             capabilities:
               drop:
                 - all
-              add:
-                - CAP_CHOWN
-                - CAP_DAC_OVERRIDE
-                - CAP_SETGID
-                - CAP_SETUID
-                - CAP_NET_BIND_SERVICE
           ports:
             - containerPort: 8080
-          # livenessProbe:
-          #   httpGet:
-          #     path: /health
-          #     scheme: HTTP
-          #     port: 8282
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 5
-          # readinessProbe:
-          #   httpGet:
-          #     path: /health?bundle=true
-          #     scheme: HTTP
-          #     port: 8282
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 5
-          # resources:
-          # limits:
-          #   cpu: 100m 
-          #   memory: 256Mi
-          # requests:
-          #   cpu: 100m
-          #   memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
           
         - name: opa
           image: openpolicyagent/opa:0.34.2-envoy-rootless

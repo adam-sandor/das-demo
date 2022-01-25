@@ -35,9 +35,9 @@ metadata:
     app.kubernetes.io/name: banking-demo
 spec:
   hosts:
-    - banking-demo.styra-sa.com
+    - banking.styra-demo.com
   gateways:
-    - banking-demo-gw
+    - istio-system/banking-demo-gw
   http:
     - match:
         - uri:

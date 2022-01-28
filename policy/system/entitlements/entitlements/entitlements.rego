@@ -6,7 +6,7 @@ jwt = {"payload": payload} {
 
 entitlements["account/details"] {
   jwt.payload.role == "customer_support"
-  jwt.payload.role_level >= 1
+  jwt.payload.role_level >= 2
 }
 
 entitlements["account/transactions"] {

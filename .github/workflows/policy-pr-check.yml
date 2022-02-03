@@ -14,12 +14,12 @@ jobs:
       - uses: actions/checkout@v2
       - name: Configure Styra CLI
         env:
-          STYRA_API_TOKEN: ${{ secrets.ADAMSANDOR_DAS_API_TOKEN }}
+          STYRA_API_TOKEN: ${{ secrets.STYRA_API_TOKEN }}
         run: |
           curl -s -o styra https://docs.styra.com/bin/linux/amd64/styra
           mv styra /usr/local/bin/styra
           chmod +x /usr/local/bin/styra
-          styra configure -i https://adamsandor.svc.styra.com -t ${STYRA_API_TOKEN}
+          styra configure -i https://expo.styra.com -t ${STYRA_API_TOKEN}
       - name: Replay decision logs
         id: replay
         working-directory: policy

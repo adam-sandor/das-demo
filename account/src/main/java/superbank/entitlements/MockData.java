@@ -27,10 +27,10 @@ public class MockData {
     private static Logger log = LoggerFactory.getLogger(MockData.class);
 
     public void initialize() {
-        AccountHolder adamSandor = accountHolderRepository.save(new AccountHolder("Adam Sandor", "Borgerstraat 143B, Amsterdam"));
-        Account account1 = accountRepository.save(new Account("NL12345435345435345", adamSandor, "EU"));
+        AccountHolder mrAndreson = accountHolderRepository.save(new AccountHolder("Mr. Anderson", "Spiegelgracht, Amsterdam"));
+        Account account1 = accountRepository.save(new Account("NL12345435345435345", mrAndreson, "EU"));
         log.info("Mock account IBAN: {}", account1.getIban());
-        Account account2 = accountRepository.save(new Account("NL12345435345444444", adamSandor, "EU"));
+        Account account2 = accountRepository.save(new Account("NL12345435345444444", mrAndreson, "EU"));
         tr.save(new Transaction("SK54354656343444", 135.2, account1, Instant.parse("2021-12-05T10:15:30.00Z"), OUTGOING, SUCCESS));
         tr.save(new Transaction("SK54354656343444", 115.5, account1, Instant.parse("2021-12-02T10:15:30.00Z"), OUTGOING, SUCCESS));
         tr.save(new Transaction("SK54354656343444",  35.0, account1, Instant.parse("2021-12-01T08:15:30.00Z"), OUTGOING, SUCCESS));

@@ -26,7 +26,7 @@ jobs:
         run: |
           mkdir ../replay-results
           echo "Replaying decision logs for changes in Entitlements System"
-          styra validate logreplay -p account=system/account/policy/ingress/rules.rego --system=bbbbc7ec0a52487bb4d09132b39788f6 -o json > ../replay-results/replay-result1.json
+          styra validate logreplay -p policy/ingress=system/account/policy/ingress/rules.rego --system=bbbbc7ec0a52487bb4d09132b39788f6 -o json > ../replay-results/replay-result1.json
           echo "Replaying decision logs for changes in Istio System"
           styra validate logreplay -p entitlements=system/entitlements/entitlements/entitlements.rego --system=e4cfa34a5c1241ff93d93b95ee94e490 -o json > ../replay-results/replay-result2.json
           echo "------"

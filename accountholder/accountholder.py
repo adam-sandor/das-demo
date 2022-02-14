@@ -5,6 +5,7 @@ import logging
 import uuid
 import json
 import requests
+from flask import abort
 from flask import Flask
 from flask import Response
 from flask import request
@@ -26,14 +27,18 @@ def health():
 @app.route('/accountholder/<id>', methods=['GET'])
 def accountholder(id):
     app.logger.info('/accountholder/{}'.format(id))
-    # FIXME: static placeholder data
-    accountholderData = {
-        'id': id,
-        'name': 'Joe',
-        'address': '123',
-        'geo': 'EU',
-    }
-    return jsonify(accountholderData)
+    # TODO: generalize to bigger data set
+    if id == '1':
+        accountholderData = {
+            'id': '1',
+            'name': 'Mr. Anderson',
+            'address': 'Spiegelgracht, Amsterdam',
+            'geo': 'EU',
+        }
+        return jsonify(accountholderData)
+    else:
+        abort(404, 'No accountholder record of ID: {}.'.format(id))
+
 
 
 if __name__ == "__main__":

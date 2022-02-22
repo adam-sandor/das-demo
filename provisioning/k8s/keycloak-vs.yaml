@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: keycloak-vs
+  labels:
+    app.kubernetes.io/component: keycloak
+    app.kubernetes.io/name: banking-demo
+spec:
+  hosts:
+    - banking.styra-demo.com
+  gateways:
+    - istio-system/banking-demo-gw
+  http:
+    - match:
+        - uri:
+            prefix: /auth
+      route:
+        - destination:
+            port:
+              number: 80
+            host: keycloak-http

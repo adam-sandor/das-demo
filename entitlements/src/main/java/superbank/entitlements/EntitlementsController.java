@@ -28,24 +28,28 @@ class EntitlementsController {
 
 	@GetMapping("/entitlements")
 	JsonNode entitlements(@RequestHeader(name = "Authorization") String authHeader) {
-		log.info("Received entitlements request");
-		String token = AuthHeader.getBearerToken(authHeader);
+		try {
+			log.info("Received entitlements request");
+			String token = AuthHeader.getBearerToken(authHeader);
 
-		ObjectNode input = new ObjectMapper().createObjectNode();
-		input.put("jwt", token);
+			ObjectNode input = new ObjectMapper().createObjectNode();
+			input.put("jwt", token);
 
-		ArrayNode ents = opaClient.queryForDocument(new QueryForDocumentRequest(input, "entitlements/entitlements"), ArrayNode.class);
+			ArrayNode ents = opaClient.queryForDocument(new QueryForDocumentRequest(input, "entitlements/entitlements"), ArrayNode.class);
 
-		ObjectNode output = new ObjectMapper().createObjectNode();
-		output.set("entitlements", ents);
-		ObjectNode subject = new ObjectMapper().createObjectNode();
-		DecodedJWT decodedJWT = JWT.decode(token);
-		subject.put("fullname", decodedJWT.getClaim("sub").asString());
-		subject.put("role", decodedJWT.getClaim("role").asString());
-		subject.put("role_level", decodedJWT.getClaim("role_level").asInt());
-		subject.put("geo_region", decodedJWT.getClaim("geo_region").asString());
-		output.set("subject", subject);
-		return output;
+			ObjectNode output = new ObjectMapper().createObjectNode();
+			output.set("entitlements", ents);
+			ObjectNode subject = new ObjectMapper().createObjectNode();
+			DecodedJWT decodedJWT = JWT.decode(token);
+			subject.put("fullname", decodedJWT.getClaim("name").asString());
+			subject.put("role", decodedJWT.getClaim("role").asString());
+			subject.put("role_level", decodedJWT.getClaim("role_level").asInt());
+			subject.put("geo_region", decodedJWT.getClaim("geo_region").asString());
+			output.set("subject", subject);
+			return output;
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 

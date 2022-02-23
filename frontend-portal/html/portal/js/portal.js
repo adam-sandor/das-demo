@@ -1,10 +1,10 @@
-function readyFn() {
-    const keycloak = new Keycloak({
-        url: 'https://banking-demo.expo.styralab.com/auth',
-        realm: 'banking-demo',
-        clientId: 'banking-demo-portal'
-    });
+const keycloak = new Keycloak({
+    url: 'https://banking-demo.expo.styralab.com/auth',
+    realm: 'banking-demo',
+    clientId: 'banking-demo-portal'
+});
 
+function readyFn() {
     keycloak.onAuthError = function (errorData) {
         console.log("Auth Error: " + JSON.stringify(errorData) );
     };
@@ -101,6 +101,7 @@ $('#account-details').click(function () {
     $.ajax({
         type: "GET",
         url: accountServiceUrl() + $('#account-iban-input').val() + "/details",
+        headers: { "Authorization": "Bearer " + keycloak.token },
         success: ready,
         error: error
     })
@@ -144,6 +145,7 @@ $('#account-transactions').click(function () {
     $.ajax({
         type: "GET",
         url: accountServiceUrl() + $('#account-iban-input').val() + "/transactions",
+        headers: { "Authorization": "Bearer " + keycloak.token },
         success: ready,
         error: error
     })

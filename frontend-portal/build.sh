@@ -1,1 +1,1 @@
-docker buildx build --platform linux/amd64 .
+docker buildx build --platform linux/amd64 -t portal:latest .

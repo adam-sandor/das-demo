@@ -212,9 +212,8 @@ Configure VirtualService
 ##### Import configuration
 
 ```shell
-kubectl --namespace banking-demo port-forward pod/keycloak-0 8080
-
 kubectl exec -ti keycloak-0 -- bash
+export PATH=/opt/jboss/keycloak/bin:$PATH
 
 kcadm.sh config credentials --server http://localhost:8080/auth --realm master --user admin --password fdsf894fDw3tGSDGVXGDFAgdf
 
@@ -222,17 +221,28 @@ kcadm.sh config credentials --server http://localhost:8080/auth --realm master -
 kubectl cp provisioning/keycloak/banking-demo-realm.json keycloak-0:/opt/jboss
 kcadm.sh create realms -f ~/banking-demo-realm.json
 
-kcadm.sh create users -r banking-demo -s username=agent_smith -s enabled=true -s "attributes.geo_region=EU" -s "attributes.role_level=3"
+kcadm.sh create users -r banking-demo -s username=agent_smith -s enabled=true \
+  -s "attributes.geo_region=EU" -s "attributes.role_level=3" \
+  -s firstName=Agent -s lastName=Smith
 kcadm.sh set-password -r banking-demo --username agent_smith --new-password agentpassword
 kcadm.sh add-roles -r banking-demo --uusername agent_smith --rolename customer_support
 
-kcadm.sh create users -r banking-demo -s username=agent_brown -s enabled=true -s "attributes.geo_region=EU" -s "attributes.role_level=2"
+kcadm.sh create users -r banking-demo -s username=agent_brown -s enabled=true \
+  -s "attributes.geo_region=EU" -s "attributes.role_level=2" \
+  -s firstName=Agent -s lastName=Brown
 kcadm.sh set-password -r banking-demo --username agent_brown --new-password agentpassword
 kcadm.sh add-roles -r banking-demo --uusername agent_brown --rolename customer_support
 
-kcadm.sh create users -r banking-demo -s username=agent_jones -s enabled=true -s "attributes.geo_region=US" -s "attributes.role_level=2"
+kcadm.sh create users -r banking-demo -s username=agent_jones -s enabled=true \
+  -s "attributes.geo_region=US" -s "attributes.role_level=2" \
+  -s firstName=Agent -s lastName=Jones
 kcadm.sh set-password -r banking-demo --username agent_jones --new-password agentpassword
 kcadm.sh add-roles -r banking-demo --uusername agent_jones --rolename customer_support
+```
+
+If you need to access the admin console you have to port-forward it to you machine
+```shell
+kubectl --namespace banking-demo port-forward pod/keycloak-0 8080
 ```
 
 ## access portal in browser

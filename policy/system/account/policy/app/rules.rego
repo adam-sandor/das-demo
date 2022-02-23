@@ -1,7 +1,7 @@
 package policy.app
 
 deny[message] {
-    input.subject.role != "customer_support"
+    not "customer_support" in input.subject.role
     message := sprintf("unauthorized role %v", [input.subject.role])
 }
 

@@ -1,21 +1,22 @@
 package entitlements
 
-jwt = {"payload": payload} {
+jwt = {"payload": payload, "roles": roles} {
   [_, payload, _] := io.jwt.decode(input.jwt)
+  roles := payload.realm_access.roles
 }
 
 entitlements["account/details"] {
-  jwt.payload.role[_] == "customer_support"
+  jwt.roles[_] == "customer_support"
   jwt.payload.role_level >= 1
 }
 
 entitlements["account/transactions"] {
-  jwt.payload.role[_] == "customer_support"
+  jwt.roles[_] == "customer_support"
   jwt.payload.role_level >= 2
 }
 
 entitlements["account/block"] {
-  jwt.payload.role[_] == "customer_support"
+  jwt.roles[_] == "customer_support"
   jwt.payload.role_level >= 3
 }
 

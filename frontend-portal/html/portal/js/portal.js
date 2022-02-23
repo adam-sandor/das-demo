@@ -21,7 +21,13 @@ function readyFn() {
                 headers: { "Authorization": "Bearer " + keycloak.token },
                 success: entitlementsReady,
                 error: entitlementsCallError
-            })
+            });
+
+            const logout = $("#logout");
+            logout.show();
+            logout.click(function() {
+               keycloak.logout();
+            });
         }
     }).catch(function() {
         console.log('failed to initialize');

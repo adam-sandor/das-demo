@@ -1,7 +1,8 @@
 package policy.app
+import future.keywords.in
 
 deny[message] {
-    not "customer_support" in input.subject.role
+    not "customer_support" in input.subject.roles
     message := sprintf("unauthorized role %v", [input.subject.role])
 }
 

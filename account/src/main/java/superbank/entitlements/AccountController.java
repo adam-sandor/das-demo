@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static io.netty.util.internal.SystemPropertyUtil.contains;
+
 @RestController
 class AccountController {
 
@@ -44,7 +46,8 @@ class AccountController {
 										  @RequestHeader(name = "Authorization") String authHeader) {
 		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
 		//CS Level 1 and above can see account details
-		if (!StringUtils.equals(jwt.getClaim("role").asString(), "customer_support")
+		List<String> roles = (List<String>) jwt.getClaim("realm_access").asMap().get("roles");
+		if (!roles.contains("customer_support")
 			|| jwt.getClaim("role_level").asInt() < 1) {
 			return ResponseEntity.status(403).build();
 		}
@@ -76,7 +79,8 @@ class AccountController {
 			return ResponseEntity.status(404).body(errorNode("Account " + accountIban + " not found"));
 		}
 
-		if (!StringUtils.equals(jwt.getClaim("role").asString(), "customer_support")) {
+		List<String> roles = (List<String>) jwt.getClaim("realm_access").asMap().get("roles");
+		if (!roles.contains("customer_support")) {
 			return ResponseEntity.status(403).build();
 		}
 

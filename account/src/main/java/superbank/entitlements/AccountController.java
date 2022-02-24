@@ -5,7 +5,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +43,8 @@ class AccountController {
 										  @RequestHeader(name = "Authorization") String authHeader) {
 		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
 		//CS Level 1 and above can see account details
-		if (!StringUtils.equals(jwt.getClaim("role").asString(), "customer_support")
+		List<String> roles = (List<String>) jwt.getClaim("realm_access").asMap().get("roles");
+		if (!roles.contains("customer_support")
 			|| jwt.getClaim("role_level").asInt() < 1) {
 			return ResponseEntity.status(403).build();
 		}
@@ -76,7 +76,8 @@ class AccountController {
 			return ResponseEntity.status(404).body(errorNode("Account " + accountIban + " not found"));
 		}
 
-		if (!StringUtils.equals(jwt.getClaim("role").asString(), "customer_support")) {
+		List<String> roles = (List<String>) jwt.getClaim("realm_access").asMap().get("roles");
+		if (!roles.contains("customer_support")) {
 			return ResponseEntity.status(403).build();
 		}
 

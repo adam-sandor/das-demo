@@ -1,10 +1,37 @@
+const keycloak = new Keycloak({
+    url: 'https://banking-demo.expo.styralab.com/auth',
+    realm: 'banking-demo',
+    clientId: 'banking-demo-portal'
+});
+
 function readyFn() {
-    $.ajax({
-        type: "GET",
-        url: "/entitlements",
-        success: entitlementsReady,
-        error: entitlementsCallError
-    })
+    keycloak.onAuthError = function (errorData) {
+        console.log("Auth Error: " + JSON.stringify(errorData) );
+    };
+
+    keycloak.init({
+        enableLogging: true,
+        onLoad: 'login-required'
+    }).then(function(authenticated) {
+        console.log(authenticated ? 'authenticated' : 'not authenticated');
+        if (authenticated) {
+            $.ajax({
+                type: "GET",
+                url: "/entitlements",
+                headers: { "Authorization": "Bearer " + keycloak.token },
+                success: entitlementsReady,
+                error: entitlementsCallError
+            });
+
+            const logout = $("#logout");
+            logout.show();
+            logout.click(function() {
+               keycloak.logout();
+            });
+        }
+    }).catch(function() {
+        console.log('failed to initialize');
+    });
 }
 
 function entitlementsReady(data) {
@@ -18,17 +45,20 @@ function entitlementsReady(data) {
         $("#account-block").show()
     }
     $('#user-full-name').text(data.subject.fullname);
-    $('#user-role').text(data.subject.role);
+    $('#user-role').text("Customer Support");
     $('#user-role-level').text("Level " + data.subject.role_level);
     $('#user-geo-region').text(data.subject.geo_region);
     if (data.subject.fullname === "Agent Brown") {
         $('#agent-pic').attr('src','img/agent-brown.png')
+        $('#agent-pic').show()
     }
     if (data.subject.fullname === "Agent Smith") {
         $('#agent-pic').attr('src','img/agent-smith.png')
+        $('#agent-pic').show()
     }
     if (data.subject.fullname === "Agent Jones") {
         $('#agent-pic').attr('src', 'img/agent-jones.png')
+        $('#agent-pic').show()
     }
 }
 
@@ -71,6 +101,7 @@ $('#account-details').click(function () {
     $.ajax({
         type: "GET",
         url: accountServiceUrl() + $('#account-iban-input').val() + "/details",
+        headers: { "Authorization": "Bearer " + keycloak.token },
         success: ready,
         error: error
     })
@@ -114,6 +145,7 @@ $('#account-transactions').click(function () {
     $.ajax({
         type: "GET",
         url: accountServiceUrl() + $('#account-iban-input').val() + "/transactions",
+        headers: { "Authorization": "Bearer " + keycloak.token },
         success: ready,
         error: error
     })

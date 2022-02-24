@@ -99,15 +99,20 @@ class AccountControllerWithOpa {
 		ObjectNode subject = new ObjectMapper().createObjectNode();
 		subject.put("sub", jwt.getClaim("sub").asString());
 		subject.put("userId", jwt.getClaim("userId").asString());
-		subject.put("role", jwt.getClaim("role").asString());
 		subject.put("role_level", jwt.getClaim("role_level").asInt());
 		subject.put("geo_region", jwt.getClaim("geo_region").asString());
 		input.set("subject", subject);
+
 		ObjectNode accountNode = new ObjectMapper().createObjectNode();
 		accountNode.put("iban", account.getIban());
 		accountNode.put("geo_region", account.getGeoRegion());
 		accountNode.putPOJO("account_holder", account.getAccountHolder());
 		input.set("account", accountNode);
+
+		List<String> roles = (List<String>) jwt.getClaim("realm_access").asMap().get("roles");
+		ArrayNode rolesNode = new ObjectMapper().createArrayNode();
+		roles.forEach(role -> rolesNode.add(role));
+		subject.set("roles", rolesNode);
 		return input;
 	}
 

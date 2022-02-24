@@ -21,6 +21,7 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+	<script src="https://banking-demo.expo.styralab.com/auth/js/keycloak.js"></script>
 
 </head>
 
@@ -46,7 +47,7 @@
                         <a href="#">Support Portal</a>
                     </li>
                     <li>
-                        <a href="#">My Account</a>
+                        <a id="logout" href="#" style="display: none">Log Out</a>
                     </li>
                 </ul>
 
@@ -125,12 +126,12 @@
 					</h3>
 				</div>
 				<div class="panel-body">
-					<div id="user-full-name">Jane Doe</div>
-					<div id="user-role">Customer Support</div>
-					<div id="user-role-level">Level 2</div>
-					<div id="user-geo-region">EU</div>
+					<div id="user-full-name"></div>
+					<div id="user-role"></div>
+					<div id="user-role-level"></div>
+					<div id="user-geo-region"></div>
 				</div>
-				<img id="agent-pic" style="margin-left: 10px; margin-bottom: 10px" src="" width="150px" height="150px">
+				<img style="display: none" id="agent-pic" style="margin-left: 10px; margin-bottom: 10px" src="" width="150px" height="150px">
 			</div>
  
 			<!-- Progress Bars -->

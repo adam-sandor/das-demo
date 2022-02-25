@@ -39,7 +39,7 @@ jobs:
       - id: gke-get-credentials
         uses: google-github-actions/get-gke-credentials@v0
         with:
-          cluster_name: cluster-1
+          cluster_name: expo-banteng
           location: us-west2-a
       - name: Deploy to Kubernetes
         run: |

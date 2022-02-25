@@ -152,10 +152,10 @@ $('#account-transactions').click(function () {
 });
 
 function accountServiceUrl() {
-    if (window.location.hash === '#opa-enabled') {
-        return '/account/v2/'
-    } else {
+    if (window.location.hash === '#account-controller-opa-disabled') {
         return '/account/'
+    } else {
+        return '/account/v2/'
     }
 }
 

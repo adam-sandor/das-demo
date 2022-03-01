@@ -6,7 +6,7 @@ usage of OPA and Styra DAS to secure the application's microservices.
 ## How to use
 
 There are 3 parts to the demo:
-* The Portal at https://banking-demo.expo.styralab.com/portal
+* The Portal at https://banking-demo.expo.styralab.com/portal/
 * The policies in the Expo tenant:
   * Istio system: https://expo.styra.com/systems/bbbbc7ec0a52487bb4d09132b39788f6
   * Custom system: https://expo.styra.com/systems/e4cfa34a5c1241ff93d93b95ee94e490

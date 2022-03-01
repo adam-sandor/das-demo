@@ -38,6 +38,10 @@ See Repo structure section for explanation of different components here.
 
 ![architecture-diagram.jpg](/img/architecture.jpg)
 
+## Contribute
+
+Github project with tasks/ideas: https://github.com/StyraInc/banking-demo/projects/1
+
 ## Repo structure
 
 ### `/policy`

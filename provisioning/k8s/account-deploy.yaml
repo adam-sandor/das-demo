@@ -80,7 +80,7 @@ spec:
 
       containers:
         - name: account
-          image: adamsandor83/account:latest
+          image: ericjkao/account:latest
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false

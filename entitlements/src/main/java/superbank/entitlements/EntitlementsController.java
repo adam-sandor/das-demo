@@ -52,5 +52,30 @@ class EntitlementsController {
 		}
 	}
 
+	@GetMapping("/entz")
+	JsonNode entz(@RequestHeader(name = "Authorization") String authHeader) {
+		try {
+			log.info("Received entitlements request");
+			String token = AuthHeader.getBearerToken(authHeader);
+			DecodedJWT decodedJWT = JWT.decode(token);
+
+			ObjectNode input = new ObjectMapper().createObjectNode();
+			input.put("subject", decodedJWT.getClaim("preferred_username").asString());
+
+			ArrayNode ents = opaClient.queryForDocument(new QueryForDocumentRequest(input, "policy/entitlements"), ArrayNode.class);
+
+			ObjectNode output = new ObjectMapper().createObjectNode();
+			output.set("entitlements", ents);
+			ObjectNode subject = new ObjectMapper().createObjectNode();
+			subject.put("fullname", decodedJWT.getClaim("name").asString());
+			subject.put("role", decodedJWT.getClaim("role").asString());
+			subject.put("role_level", decodedJWT.getClaim("role_level").asInt());
+			subject.put("geo_region", decodedJWT.getClaim("geo_region").asString());
+			output.set("subject", subject);
+			return output;
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
 
 }

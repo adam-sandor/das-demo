@@ -49,7 +49,7 @@ class AccountController {
 	@GetMapping("/account/{accountIban}/details")
 	ResponseEntity<AccountWithHolder> accountDetails(@PathVariable(name = "accountIban") String accountIban,
 										  @RequestHeader(name = "Authorization") String authHeader)
-		throws java.net.URISyntaxException {
+		throws Exception {
 		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
 		//CS Level 1 and above can see account details
 		List<String> roles = (List<String>) jwt.getClaim("realm_access").asMap().get("roles");
@@ -62,30 +62,19 @@ class AccountController {
 		if (account.isPresent()) {
 			//CS of any level can only see accounts from their assigned geographic region
 			if (account.get().getGeoRegion().equals(jwt.getClaim("geo_region").asString())) {
-				HttpResponse<String> response;
-		        try {
-                        HttpRequest request = HttpRequest.newBuilder()
-                            .uri(new URI(String.format(
-                                "http://accountholder-svc/accountholder/%s", account.get().getAccountHolderId())))
-                            .GET()
-                            .build();
-                        response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-                        if (response.statusCode() >= 300) {
-                            return ResponseEntity.status(response.statusCode()).build();
-			            }
-			        } catch (java.net.SocketException exception) {
-                        log.error("Error retrieving accountholder data.", exception);
-			            return ResponseEntity.status(500).build();
-			        } catch (java.io.IOException exception) {
-                        log.error("Error retrieving accountholder data.", exception);
-			            return ResponseEntity.status(500).build();
-			        } catch (java.lang.InterruptedException exception) {
-                        log.error("Error retrieving accountholder data.", exception);
-			            return ResponseEntity.status(500).build();
-			        }
-					return new ResponseEntity<>(
-						new AccountWithHolder(account.get(), new AccountHolder(response.body())),
-						HttpStatus.OK);
+				HttpRequest request = HttpRequest.newBuilder()
+					.uri(new URI(String.format(
+						"http://accountholder-svc/accountholder/%s", account.get().getAccountHolderId())))
+					.GET()
+					.build();
+				HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+				if (response.statusCode() >= 300) {
+					return ResponseEntity.status(response.statusCode()).build();
+				}
+
+				return new ResponseEntity<>(
+					new AccountWithHolder(account.get(), new AccountHolder(response.body())),
+					HttpStatus.OK);
 			} else {
 				return ResponseEntity.status(403).build();
 			}

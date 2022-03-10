@@ -23,6 +23,7 @@ import superbank.entitlements.entities.AccountHolder;
 import superbank.entitlements.entities.AccountWithHolder;
 import superbank.entitlements.entities.Transaction;
 
+import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -54,32 +55,19 @@ class AccountControllerWithOpa {
 	@GetMapping("/account/v2/{accountIban}/details")
 	ResponseEntity<AccountWithHolder> accountDetails(@PathVariable(name = "accountIban") String accountIban,
 										  @RequestHeader(name = "Authorization") String authHeader)
-		throws java.net.URISyntaxException {
-		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
+			throws Exception {
 		Optional<Account> account = accountRepository.findAccountByIban(accountIban);
 		if (account.isPresent()) {
-			HttpResponse<String> response;
-	        try {
-                    HttpRequest request = HttpRequest.newBuilder()
-                        .uri(new URI(String.format(
-                            "http://accountholder-svc/accountholder/%s", account.get().getAccountHolderId())))
-                        .GET()
-                        .build();
-		            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-		            if (response.statusCode() >= 300) {
-                        return ResponseEntity.status(response.statusCode()).build();
-		            }
-		        } catch (java.net.SocketException exception) {
-                    log.error("Error retrieving accountholder data.", exception);
-		            return ResponseEntity.status(500).build();
-		        } catch (java.io.IOException exception) {
-                    log.error("Error retrieving accountholder data.", exception);
-		            return ResponseEntity.status(500).build();
-		        } catch (java.lang.InterruptedException exception) {
-                    log.error("Error retrieving accountholder data.", exception);
-		            return ResponseEntity.status(500).build();
-		        }
-				return new ResponseEntity<>(
+			HttpRequest request = HttpRequest.newBuilder()
+				.uri(new URI(String.format(
+					"http://accountholder-svc/accountholder/%s", account.get().getAccountHolderId())))
+				.GET()
+				.build();
+			HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+			if (response.statusCode() >= 300) {
+				return ResponseEntity.status(response.statusCode()).build();
+			}
+			return new ResponseEntity<>(
 					new AccountWithHolder(account.get(), new AccountHolder(response.body())),
 					HttpStatus.OK);
 		} else {

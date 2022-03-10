@@ -19,7 +19,7 @@ public class Account {
 
     public Account(String iban, long accountHolderId, String geoRegion) {
         this.iban = iban;
-        this.accountHolderId = new Long(accountHolderId);
+        this.accountHolderId = accountHolderId;
         this.geoRegion = geoRegion;
     }
 
@@ -28,7 +28,7 @@ public class Account {
     }
 
     public long getAccountHolderId() {
-        return accountHolderId.longValue();
+        return accountHolderId;
     }
 
     @Override

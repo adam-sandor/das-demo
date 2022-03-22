@@ -17,7 +17,7 @@ entitlements["account/transactions"] {
 
 entitlements["account/block"] {
   jwt.roles[_] == "customer_support"
-  jwt.payload.role_level >= 3
+  jwt.payload.role_level >= 2
 }
 
 default allowed = false

@@ -212,13 +212,16 @@ Configure VirtualService
 ##### Import configuration
 
 ```shell
+kubectl cp provisioning/keycloak/banking-demo-realm.json keycloak-0:/opt/jboss
+
 kubectl exec -ti keycloak-0 -- bash
+
+#--- Executed inside the container ----#
 export PATH=/opt/jboss/keycloak/bin:$PATH
 
 kcadm.sh config credentials --server http://localhost:8080/auth --realm master --user admin --password fdsf894fDw3tGSDGVXGDFAgdf
 
 #copy realm definition file into pod and create realm using it
-kubectl cp provisioning/keycloak/banking-demo-realm.json keycloak-0:/opt/jboss
 kcadm.sh create realms -f ~/banking-demo-realm.json
 
 kcadm.sh create users -r banking-demo -s username=agent_smith -s enabled=true \
@@ -240,7 +243,7 @@ kcadm.sh set-password -r banking-demo --username agent_jones --new-password agen
 kcadm.sh add-roles -r banking-demo --uusername agent_jones --rolename customer_support
 ```
 
-If you need to access the admin console you have to port-forward it to you machine
+Optional: If you need to access the admin console you have to port-forward it to you machine
 ```shell
 kubectl --namespace banking-demo port-forward pod/keycloak-0 8080
 ```

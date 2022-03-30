@@ -1,10 +1,16 @@
 package object
 
 roles := {
-	"account/block": {"allow": {"include": [{
+	"customer_support_level_1": {"allow": {"include": [{
+	    "actions": ["details"],
+	    "resources": ["account"]
 	}]}},
-	"account/transations": {"allow": {"include": [{
+	"customer_support_level_2": {"allow": {"include": [{
+	    "actions": ["details", "transactions"],
+	    "resources": ["account"]
 	}]}},
-    "account/details": {"allow": {"include": [{
-    }]}},
+	"customer_support_level_3": {"allow": {"include": [{
+	    "actions": ["details", "transactions", "block"],
+	    "resources": ["account"]
+	}]}}
 }

@@ -10,14 +10,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-@Entity
 public class AccountHolder {
 
     private static JsonParser jsonParser = JsonParserFactory.getJsonParser();
-
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long id;
 
     private String name;
     private String address;
@@ -33,10 +28,6 @@ public class AccountHolder {
         Map<String, Object> parsedJson = jsonParser.parseMap(json);
         this.name = parsedJson.getOrDefault("name", "<null>").toString();
         this.address = parsedJson.getOrDefault("address", "<null>").toString();
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public String getName() {

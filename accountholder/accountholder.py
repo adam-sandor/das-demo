@@ -32,7 +32,7 @@ def accountholder(id):
         accountholderData = {
             'id': '1',
             'name': 'Mr. Anderson',
-            'address': 'Spiegelgracht, Amsterdam',
+            'address': 'Borgerstraat, Amsterdam',
             'geo': 'EU',
         }
         return jsonify(accountholderData)

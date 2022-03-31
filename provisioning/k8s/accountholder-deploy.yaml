@@ -74,21 +74,14 @@ spec:
       hostPID: false
       hostIPC: false
       hostNetwork: false
-      # securityContext:
-      #   runAsUser: 1000
-      #   runAsGroup: 100
-
       containers:
         - name: accountholder
-          image: ericjkao/accountholder:latest
+          image: adamsandor83/accountholder:latest
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
             privileged: false
             readOnlyRootFilesystem: true
-            # runAsNonRoot: true
-            # runAsUser: 1000
-            # runAsGroup: 1000
             capabilities:
               drop:
                 - all
@@ -101,21 +94,20 @@ spec:
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 5
-          # readinessProbe:
-          #   httpGet:
-          #     path: /health?bundle=true
-          #     scheme: HTTP
-          #     port: 8282
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 5
-          # resources:
-          # limits:
-          #   cpu: 100m 
-          #   memory: 256Mi
-          # requests:
-          #   cpu: 100m
-          #   memory: 256Mi
-          
+          readinessProbe:
+             httpGet:
+               path: /health?bundle=true
+               scheme: HTTP
+               port: 8282
+             initialDelaySeconds: 5
+             periodSeconds: 5
+          resources:
+            limits:
+              cpu: 1
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
         - name: opa
           image: openpolicyagent/opa:0.34.2-envoy-rootless
           imagePullPolicy: Always
@@ -156,15 +148,6 @@ spec:
               port: 8282
             initialDelaySeconds: 5
             periodSeconds: 5
-          
-          # resources:
-          # limits:
-          #   cpu: 100m 
-          #   memory: 256Mi
-          # requests:
-          #   cpu: 100m
-          #   memory: 256Mi
-          
       volumes:
         - name: opa-config-vol
           configMap:

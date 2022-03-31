@@ -4,19 +4,11 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
 
-@Entity
 public class AccountWithHolder {
 
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long id;
-
     private String iban;
-    @ManyToOne
     private AccountHolder accountHolder;
     private String geoRegion;
-
-    protected AccountWithHolder() {}
 
     public AccountWithHolder(Account account, AccountHolder accountHolder) {
         this.iban = account.getIban();

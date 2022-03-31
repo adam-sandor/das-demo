@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,9 @@ class AccountControllerWithOpa {
 
 	private final TransactionRepository transactionRepository;
 
+	@Value("${ACCOUNT_HOLDER_URL:http://accountholder-svc/accountholder}")
+	private String accountHolderUrl = "";
+
 	private final HttpClient httpClient = HttpClient.newBuilder().build();
 
 	private static final Logger log = LoggerFactory.getLogger(AccountControllerWithOpa.class);
@@ -53,18 +57,19 @@ class AccountControllerWithOpa {
 	}
 
 	@GetMapping("/account/v2/{accountIban}/details")
-	ResponseEntity<AccountWithHolder> accountDetails(@PathVariable(name = "accountIban") String accountIban,
-										  @RequestHeader(name = "Authorization") String authHeader)
+	ResponseEntity<AccountWithHolder> accountDetails(@PathVariable(name = "accountIban") String accountIban)
 			throws Exception {
 		Optional<Account> account = accountRepository.findAccountByIban(accountIban);
 		if (account.isPresent()) {
+			log.info("Requesting account holder for account {}", accountIban);
+			URI uri = new URI(accountHolderUrl + "/" + account.get().getAccountHolderId());
 			HttpRequest request = HttpRequest.newBuilder()
-				.uri(new URI(String.format(
-					"http://accountholder-svc/accountholder/%s", account.get().getAccountHolderId())))
-				.GET()
-				.build();
+					.uri(uri)
+					.GET()
+					.build();
 			HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 			if (response.statusCode() >= 300) {
+				log.error("Error getting account holder for account {}: code={} resp-body={}", uri, response.statusCode(), response.body());
 				return ResponseEntity.status(response.statusCode()).build();
 			}
 			return new ResponseEntity<>(

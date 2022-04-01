@@ -96,9 +96,9 @@ spec:
             periodSeconds: 5
           readinessProbe:
              httpGet:
-               path: /health?bundle=true
+               path: /health
                scheme: HTTP
-               port: 8282
+               port: 8080
              initialDelaySeconds: 5
              periodSeconds: 5
           resources:
@@ -139,11 +139,11 @@ spec:
               path: /health
               scheme: HTTP
               port: 8282
-            initialDelaySeconds: 5      # Tune these periods for your environemnt
+            initialDelaySeconds: 5
             periodSeconds: 5
           readinessProbe:
             httpGet:
-              path: /health?bundle=true  # Include bundle activation in readiness
+              path: /health
               scheme: HTTP
               port: 8282
             initialDelaySeconds: 5

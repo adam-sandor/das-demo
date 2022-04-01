@@ -24,7 +24,6 @@ public class MockData {
     private static Logger log = LoggerFactory.getLogger(MockData.class);
 
     public void initialize() {
-        // AccountHolder mrAndreson = accountHolderRepository.save(new AccountHolder("Mr. Anderson", "Spiegelgracht, Amsterdam"));
         Account account1 = accountRepository.save(new Account("EU12345435345435345", 1, "EU"));
         log.info("Mock account IBAN: {}", account1.getIban());
         Account account2 = accountRepository.save(new Account("US12345435345444444", 1, "US"));

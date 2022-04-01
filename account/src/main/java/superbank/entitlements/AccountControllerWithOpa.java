@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +20,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import superbank.entitlements.entities.Account;
+import superbank.entitlements.entities.AccountHolder;
+import superbank.entitlements.entities.AccountWithHolder;
 import superbank.entitlements.entities.Transaction;
 
+import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +41,11 @@ class AccountControllerWithOpa {
 
 	private final TransactionRepository transactionRepository;
 
+	@Value("${ACCOUNT_HOLDER_URL:http://accountholder-svc/accountholder}")
+	private String accountHolderUrl = "";
+
+	private final HttpClient httpClient = HttpClient.newBuilder().build();
+
 	private static final Logger log = LoggerFactory.getLogger(AccountControllerWithOpa.class);
 
 	public AccountControllerWithOpa(@Autowired OpaClient opaClient,
@@ -44,16 +57,24 @@ class AccountControllerWithOpa {
 	}
 
 	@GetMapping("/account/v2/{accountIban}/details")
-	ResponseEntity<Account> accountDetails(@PathVariable(name = "accountIban") String accountIban,
-										  @RequestHeader(name = "Authorization") String authHeader) {
-		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
+	ResponseEntity<AccountWithHolder> accountDetails(@PathVariable(name = "accountIban") String accountIban)
+			throws Exception {
 		Optional<Account> account = accountRepository.findAccountByIban(accountIban);
 		if (account.isPresent()) {
-			if (authorizeAccountWithOpa(jwt, account.get())) {
-				return new ResponseEntity<>(account.get(), HttpStatus.OK);
-			} else {
-				return ResponseEntity.status(403).build();
+			log.info("Requesting account holder for account {}", accountIban);
+			URI uri = new URI(accountHolderUrl + "/" + account.get().getAccountHolderId());
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(uri)
+					.GET()
+					.build();
+			HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+			if (response.statusCode() >= 300) {
+				log.error("Error getting account holder for account {}: code={} resp-body={}", uri, response.statusCode(), response.body());
+				return ResponseEntity.status(response.statusCode()).build();
 			}
+			return new ResponseEntity<>(
+					new AccountWithHolder(account.get(), new AccountHolder(response.body())),
+					HttpStatus.OK);
 		} else {
 			return ResponseEntity.notFound().build();
 		}
@@ -106,7 +127,7 @@ class AccountControllerWithOpa {
 		ObjectNode accountNode = new ObjectMapper().createObjectNode();
 		accountNode.put("iban", account.getIban());
 		accountNode.put("geo_region", account.getGeoRegion());
-		accountNode.putPOJO("account_holder", account.getAccountHolder());
+		// accountNode.putPOJO("account_holder", account.getAccountHolder());
 		input.set("account", accountNode);
 
 		List<String> roles = (List<String>) jwt.getClaim("realm_access").asMap().get("roles");

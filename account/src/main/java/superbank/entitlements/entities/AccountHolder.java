@@ -1,18 +1,18 @@
 package superbank.entitlements.entities;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.boot.json.JsonParser;
+import org.springframework.boot.json.JsonParserFactory;
 
+import java.util.Map;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-@Entity
 public class AccountHolder {
 
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long id;
+    private static JsonParser jsonParser = JsonParserFactory.getJsonParser();
 
     private String name;
     private String address;
@@ -24,8 +24,10 @@ public class AccountHolder {
         this.address = address;
     }
 
-    public Long getId() {
-        return id;
+    public AccountHolder(String json) {
+        Map<String, Object> parsedJson = jsonParser.parseMap(json);
+        this.name = parsedJson.getOrDefault("name", "<null>").toString();
+        this.address = parsedJson.getOrDefault("address", "<null>").toString();
     }
 
     public String getName() {

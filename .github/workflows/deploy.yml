@@ -32,6 +32,8 @@ jobs:
           ./push.sh
           cd ../frontend-portal
           ./push.sh
+          cd ../accountholder
+          ./push.sh
       - id: gke-auth
         uses: google-github-actions/auth@v0
         with:
@@ -44,10 +46,12 @@ jobs:
       - name: Deploy to Kubernetes
         run: |
           sed -i 's/banking.styra-demo.com/banking-demo.expo.styralab.com/' provisioning/k8s/account-deploy.yaml
+          sed -i 's/banking.styra-demo.com/banking-demo.expo.styralab.com/' provisioning/k8s/accountholder-deploy.yaml
           sed -i 's/banking.styra-demo.com/banking-demo.expo.styralab.com/' provisioning/k8s/entitlements-deploy.yaml
           sed -i 's/banking.styra-demo.com/banking-demo.expo.styralab.com/' provisioning/k8s/portal-deploy.yaml
           NS=banking-demo
           kubectl apply -f provisioning/k8s/account-deploy.yaml -n $NS
+          kubectl apply -f provisioning/k8s/accountholder-deploy.yaml -n $NS
           kubectl apply -f provisioning/k8s/entitlements-deploy.yaml -n $NS
           kubectl apply -f provisioning/k8s/portal-deploy.yaml -n $NS
           kubectl delete pod -l app.kubernetes.io/name=banking-demo -n $NS

@@ -70,7 +70,7 @@ class AccountControllerWithOpa {
 			HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 			if (response.statusCode() >= 300) {
 				log.error("Error getting account holder for account {}: code={} resp-body={}", uri, response.statusCode(), response.body());
-				new ResponseEntity<>(
+				return new ResponseEntity<>(
 						new AccountWithHolder(account.get(), new AccountHolder("", "")),
 						HttpStatus.OK);
 			}

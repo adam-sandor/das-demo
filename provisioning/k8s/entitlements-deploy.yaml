@@ -91,14 +91,14 @@ spec:
               path: /actuator/health
               scheme: HTTP
               port: 8080
-            initialDelaySeconds: 5
+            initialDelaySeconds: 20
             periodSeconds: 5
           readinessProbe:
             httpGet:
               path: /actuator/health
               scheme: HTTP
               port: 8080
-            initialDelaySeconds: 5
+            initialDelaySeconds: 15
             periodSeconds: 5
           resources:
             limits:
@@ -120,10 +120,10 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             privileged: false
-            # readOnlyRootFilesystem: true
-            # runAsNonRoot: true
-            # runAsUser: 1000
-            # runAsGroup: 1000
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
             capabilities:
               drop:
                 - all

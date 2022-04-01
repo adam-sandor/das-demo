@@ -71,7 +71,7 @@ class AccountControllerWithOpa {
 			if (response.statusCode() >= 300) {
 				log.error("Error getting account holder for account {}: code={} resp-body={}", uri, response.statusCode(), response.body());
 				return new ResponseEntity<>(
-						new AccountWithHolder(account.get(), new AccountHolder("", "")),
+						new AccountWithHolder(account.get(), new AccountHolder("Unauthorized", "Unauthorized")),
 						HttpStatus.OK);
 			}
 			return new ResponseEntity<>(

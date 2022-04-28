@@ -110,25 +110,16 @@ curl --request POST \
       }
     },
     "decision_mappings": {
-      "entitlements": {
-        "allowed": {
-          "path": "result.allowed",
-          "negated": false,
-          "expected": null
-        },
-        "reason": null,
-        "columns": null
-      },
-      "entitlements/allowed": {
-        "allowed": {
-          "path": "result",
-          "negated": false,
-          "expected": null
-        },
-        "reason": null,
-        "columns": null
-      }
-    }
+       "entitlements": {
+         "allowed": {
+           "path": "result.allowed",
+           "negated": false,
+           "expected": true
+         },
+         "reason": null,
+         "columns": null
+       }
+     }
   }'
 
 # cleanup policies banking_demo_entitlements

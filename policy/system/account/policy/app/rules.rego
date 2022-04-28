@@ -1,6 +1,11 @@
 package policy.app
 import future.keywords.in
 
+default allowed = false
+allowed {
+    count(deny) == 0
+}
+
 deny[message] {
     not "customer_support" in input.subject.roles
     message := sprintf("unauthorized role %v", [input.subject.role])

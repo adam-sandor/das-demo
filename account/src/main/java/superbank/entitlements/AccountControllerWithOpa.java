@@ -57,9 +57,12 @@ class AccountControllerWithOpa {
 	}
 
 	@GetMapping("/account/v2/{accountIban}/details")
-	ResponseEntity<AccountWithHolder> accountDetails(@PathVariable(name = "accountIban") String accountIban)
+	ResponseEntity<AccountWithHolder> accountDetails(@PathVariable(name = "accountIban") String accountIban,
+													 @RequestHeader(name = "Authorization") String authHeader)
 			throws Exception {
+		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
 		Optional<Account> account = accountRepository.findAccountByIban(accountIban);
+		log.info("Retrieving account details for account {} by subject {}", accountIban, jwt.getClaim("sub").asString());
 		if (account.isPresent()) {
 			log.info("Requesting account holder for account {}", accountIban);
 			URI uri = new URI(accountHolderUrl + "/" + account.get().getAccountHolderId());
@@ -74,9 +77,13 @@ class AccountControllerWithOpa {
 						new AccountWithHolder(account.get(), new AccountHolder("Unauthorized", "Unauthorized")),
 						HttpStatus.OK);
 			}
-			return new ResponseEntity<>(
-					new AccountWithHolder(account.get(), new AccountHolder(response.body())),
-					HttpStatus.OK);
+			if (authorizeAccountWithOpa(jwt, account.get())) {
+				return new ResponseEntity<>(
+						new AccountWithHolder(account.get(), new AccountHolder(response.body())),
+						HttpStatus.OK);
+			} else {
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
 		} else {
 			return ResponseEntity.notFound().build();
 		}
@@ -89,7 +96,7 @@ class AccountControllerWithOpa {
 		Optional<Account> account = accountRepository.findAccountByIban(accountIban);
 
 		if (!account.isPresent()) {
-			return ResponseEntity.status(404).body(errorNode("Account " + accountIban + " not found"));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorNode("Account " + accountIban + " not found"));
 		}
 
         List<Transaction> dbTransactions = transactionRepository.findAllByAccountIban(accountIban, Sort.by(Sort.Direction.DESC, "timeStamp"));

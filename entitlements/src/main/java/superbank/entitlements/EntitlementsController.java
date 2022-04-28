@@ -35,7 +35,8 @@ class EntitlementsController {
 			ObjectNode input = new ObjectMapper().createObjectNode();
 			input.put("jwt", token);
 
-			ArrayNode ents = opaClient.queryForDocument(new QueryForDocumentRequest(input, "entitlements/entitlements"), ArrayNode.class);
+			JsonNode result = opaClient.queryForDocument(new QueryForDocumentRequest(input, "entitlements"), JsonNode.class);
+			ArrayNode ents = (ArrayNode) result.get("entitlements");
 
 			ObjectNode output = new ObjectMapper().createObjectNode();
 			output.set("entitlements", ents);

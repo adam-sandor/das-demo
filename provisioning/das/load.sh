@@ -31,6 +31,60 @@ curl --request POST \
         "reference": "'$GIT_REFERENCE'",
       "url": "'$GIT_URL'"
       }
+    },
+    "decision_mappings": {
+      "": {
+        "allowed": {
+          "path": "result.allowed",
+          "negated": false,
+          "expected": true
+        },
+        "reason": {
+          "path": "result.outcome.message"
+        },
+        "columns": [
+          {
+            "key": "method",
+            "path": "input.attributes.request.http.method",
+            "type": "string"
+          },
+          {
+            "key": "path",
+            "path": "input.attributes.request.http.path",
+            "type": "string"
+          },
+          {
+            "key": "host",
+            "path": "input.attributes.request.http.host",
+            "type": "string"
+          },
+          {
+            "key": "sourceip",
+            "path": "input.attributes.source.address.Address.SocketAddress.address",
+            "type": "string"
+          }
+        ]
+      },
+      "policy/app": {
+        "allowed": {
+          "path": "result.allowed",
+          "negated": false,
+          "expected": true
+        },
+        "reason": null,
+        "columns": [
+          {
+            "key": "iban",
+            "path": "input.account.iban",
+            "type": ""
+          },
+          {
+            "key": "geo_region",
+            "path": "input.account.geo_region",
+            "type": ""
+          }
+        ]
+      }
     }
   }'
 

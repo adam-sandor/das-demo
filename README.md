@@ -14,8 +14,8 @@ There are 3 parts to the demo:
 which demonstrate different integration patterns of application logic with OPA.
 
 There are 3 sample users:
-1. Agent Smith - Level 3 EU customer support (agent_brown)
-2. Agent Brown - Level 2 EU customer support (agent_smith)
+1. Agent Smith - Level 3 EU customer support (agent_smith)
+2. Agent Brown - Level 2 EU customer support (agent_brown)
 3. Agent Jones - Level 2 US customer support (agent_jones)
 
 Policies (the general idea, not a complete list):

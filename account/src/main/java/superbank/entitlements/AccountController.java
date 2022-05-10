@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-class AccountControllerWithOpa {
+class AccountController {
 
 	private final OpaClient opaClient;
 
@@ -33,11 +33,11 @@ class AccountControllerWithOpa {
 
 	private final TransactionRepository transactionRepository;
 
-	private static final Logger log = LoggerFactory.getLogger(AccountControllerWithOpa.class);
+	private static final Logger log = LoggerFactory.getLogger(AccountController.class);
 
-	public AccountControllerWithOpa(@Autowired OpaClient opaClient,
-                                    @Autowired AccountRepository accountRepository,
-                                    @Autowired TransactionRepository transactionRepository) {
+	public AccountController(@Autowired OpaClient opaClient,
+							 @Autowired AccountRepository accountRepository,
+							 @Autowired TransactionRepository transactionRepository) {
 		this.opaClient = opaClient;
 		this.accountRepository = accountRepository;
 		this.transactionRepository = transactionRepository;

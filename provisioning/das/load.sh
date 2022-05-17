@@ -95,31 +95,6 @@ curl --request DELETE \
   --header 'authorization: Bearer '$DAS_WORKSPACE_TOKEN'' \
   --header 'content-type: application/json'
 
-
-
-# create system banking_demo_gateway
-# curl --request POST \
-#   --url $DAS_TENANT/v1/systems \
-#   --header 'authorization: Bearer '$DAS_WORKSPACE_TOKEN'' \
-#   --header 'content-type: application/json' \
-#   --data \
-#   '{
-#     "name": "banking_demo_gateway",
-#     "description": "",
-#     "read_only": false,
-#     "type": "template.envoy:2.0",
-#     "source_control": {
-#       "origin": {
-#         "credentials": "'$DAS_GIT_CREDENTIAL_NAME'",
-#         "path": "policy/system/gateway",
-#         "reference": "'$GIT_REFERENCE'",
-#       "url": "'$GIT_URL'"
-#       }
-#     }
-#   }'
-
-
-
 # create library banking_demo_jwt
 curl --request PUT \
   --url $DAS_TENANT/v1/datasources/global/jwt \

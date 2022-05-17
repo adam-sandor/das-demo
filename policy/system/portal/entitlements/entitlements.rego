@@ -2,7 +2,7 @@ package entitlements
 
 entitlements[resource] {
   data.object.users[jwt.username].role == "customer_support"
-  data.object.users[jwt.username].role_level > data.object.resources[resource].role_level
+  data.object.users[jwt.username].role_level >= data.object.resources[resource].role_level
 }
 
 default allowed = false

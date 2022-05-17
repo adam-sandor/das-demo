@@ -117,7 +117,7 @@ spec:
           #   memory: 256Mi
           
         - name: opa
-          image: openpolicyagent/opa:0.35.0-rootless
+          image: openpolicyagent/opa:0.40.0-rootless
           imagePullPolicy: Always
           args:
             - "run"

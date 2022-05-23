@@ -17,7 +17,7 @@ function readyFn() {
         if (authenticated) {
             $.ajax({
                 type: "GET",
-                url: "/entz",
+                url: "/entitlements",
                 headers: { "Authorization": "Bearer " + keycloak.token },
                 success: entitlementsReady,
                 error: entitlementsCallError

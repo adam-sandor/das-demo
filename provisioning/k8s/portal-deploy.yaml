@@ -140,24 +140,15 @@ spec:
               path: /health
               scheme: HTTP
               port: 8282
-            initialDelaySeconds: 5      # Tune these periods for your environemnt
+            initialDelaySeconds: 5
             periodSeconds: 5
           readinessProbe:
             httpGet:
-              path: /health?bundle=true  # Include bundle activation in readiness
+              path: /health?bundle=true
               scheme: HTTP
               port: 8282
             initialDelaySeconds: 5
             periodSeconds: 5
-          
-          # resources:
-          # limits:
-          #   cpu: 100m 
-          #   memory: 256Mi
-          # requests:
-          #   cpu: 100m
-          #   memory: 256Mi
-          
       volumes:
         - name: opa-config-vol
           configMap:

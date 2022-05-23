@@ -151,6 +151,11 @@ $('#account-transactions').click(function () {
     })
 });
 
+$('.accountnr').click(function () {
+   $('#account-iban-input').val($(this).text());
+   $('#account-details').click();
+});
+
 function accountServiceUrl() {
     if (window.location.hash === '#account-controller-opa-disabled') {
         return '/account/'

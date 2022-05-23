@@ -74,10 +74,6 @@ spec:
       hostPID: false
       hostIPC: false
       hostNetwork: false
-      # securityContext:
-      #   runAsUser: 1000
-      #   runAsGroup: 100
-
       containers:
         - name: account
           image: adamsandor83/account:latest
@@ -86,36 +82,32 @@ spec:
             allowPrivilegeEscalation: false
             privileged: false
             readOnlyRootFilesystem: true
-            # runAsNonRoot: true
-            # runAsUser: 1000
-            # runAsGroup: 1000
             capabilities:
               drop:
                 - all
           ports:
             - containerPort: 8080
-          # livenessProbe:
-          #   httpGet:
-          #     path: /health
-          #     scheme: HTTP
-          #     port: 8282
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 5
-          # readinessProbe:
-          #   httpGet:
-          #     path: /health?bundle=true
-          #     scheme: HTTP
-          #     port: 8282
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 5
-          # resources:
-          # limits:
-          #   cpu: 100m 
-          #   memory: 256Mi
-          # requests:
-          #   cpu: 100m
-          #   memory: 256Mi
-          
+          livenessProbe:
+             httpGet:
+               path: /actuator/health
+               scheme: HTTP
+               port: 8080
+             initialDelaySeconds: 20
+             periodSeconds: 5
+          readinessProbe:
+             httpGet:
+               path: /actuator/health
+               scheme: HTTP
+               port: 8080
+             initialDelaySeconds: 15
+             periodSeconds: 5
+          resources:
+           limits:
+             cpu: 1
+             memory: 512Mi
+           requests:
+             cpu: 100m
+             memory: 256Mi
         - name: opa
           image: openpolicyagent/opa:0.40.0-envoy-rootless
           imagePullPolicy: Always
@@ -156,15 +148,6 @@ spec:
               port: 8282
             initialDelaySeconds: 5
             periodSeconds: 5
-          
-          # resources:
-          # limits:
-          #   cpu: 100m 
-          #   memory: 256Mi
-          # requests:
-          #   cpu: 100m
-          #   memory: 256Mi
-          
       volumes:
         - name: opa-config-vol
           configMap:

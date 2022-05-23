@@ -19,18 +19,14 @@ public class MockData {
     private AccountRepository accountRepository;
 
     @Autowired
-    private AccountHolderRepository accountHolderRepository;
-
-    @Autowired
     private TransactionRepository tr;
 
     private static Logger log = LoggerFactory.getLogger(MockData.class);
 
     public void initialize() {
-        AccountHolder mrAndreson = accountHolderRepository.save(new AccountHolder("Mr. Anderson", "Spiegelgracht, Amsterdam"));
-        Account account1 = accountRepository.save(new Account("EU12345435345435345", mrAndreson, "EU"));
+        Account account1 = accountRepository.save(new Account("EU12345435345435345", 1, "EU"));
         log.info("Mock account IBAN: {}", account1.getIban());
-        Account account2 = accountRepository.save(new Account("US12345435345444444", mrAndreson, "US"));
+        Account account2 = accountRepository.save(new Account("US12345435345444444", 1, "US"));
         tr.save(new Transaction("SK54354656343444", 135.2, account1, Instant.parse("2021-12-05T10:15:30.00Z"), OUTGOING, SUCCESS));
         tr.save(new Transaction("SK54354656343444", 115.5, account1, Instant.parse("2021-12-02T10:15:30.00Z"), OUTGOING, SUCCESS));
         tr.save(new Transaction("SK54354656343444",  35.0, account1, Instant.parse("2021-12-01T08:15:30.00Z"), OUTGOING, SUCCESS));

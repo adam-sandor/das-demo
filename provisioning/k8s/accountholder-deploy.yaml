@@ -2,36 +2,36 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: entitlements-sa
+  name: accountholder-sa
   labels:
-    app.kubernetes.io/component: entitlements
+    app.kubernetes.io/component: accountholder
     app.kubernetes.io/name: banking-demo
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: entitlements-svc
+  name: accountholder-svc
   labels:
-    app.kubernetes.io/component: entitlements
+    app.kubernetes.io/component: accountholder
     app.kubernetes.io/name: banking-demo
 spec:
   selector:
-    app.kubernetes.io/component: entitlements
+    app.kubernetes.io/component: accountholder
     app.kubernetes.io/name: banking-demo
   ports:
     - name: http
       port: 80
-      targetPort: 8081
+      targetPort: 8080
   type: ClusterIP
 
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: entitlements-vs
+  name: accountholder-vs
   labels:
-    app.kubernetes.io/component: entitlements
+    app.kubernetes.io/component: accountholder
     app.kubernetes.io/name: banking-demo
 spec:
   hosts:
@@ -41,41 +41,42 @@ spec:
   http:
     - match:
         - uri:
-            prefix: /entitlements
+            prefix: /accountholder
       route:
         - destination:
             port:
               number: 80
-            host: entitlements-svc
-
+            host: accountholder-svc
+            
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: entitlements-deploy
+  name: accountholder-deploy
   labels:
-    app.kubernetes.io/component: entitlements
+    app.kubernetes.io/component: accountholder
     app.kubernetes.io/name: banking-demo
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/component: entitlements
+      app.kubernetes.io/component: accountholder
       app.kubernetes.io/name: banking-demo
   template:
     metadata:
       labels:
-        opa-istio-authz: "false"
-        app.kubernetes.io/component: entitlements
+        opa-istio-authz: "true"
+        app.kubernetes.io/component: accountholder
         app.kubernetes.io/name: banking-demo
+        
     spec:
-      serviceAccountName: entitlements-sa
+      serviceAccountName: accountholder-sa
       hostPID: false
       hostIPC: false
       hostNetwork: false
       containers:
-        - name: entitlements
-          image: adamsandor83/entitlements:latest
+        - name: accountholder
+          image: adamsandor83/accountholder:latest
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
@@ -85,36 +86,37 @@ spec:
               drop:
                 - all
           ports:
-            - containerPort: 8081
+            - containerPort: 8080
           livenessProbe:
             httpGet:
-              path: /actuator/health
+              path: /health
               scheme: HTTP
-              port: 8081
-            initialDelaySeconds: 20
+              port: 8080
+            initialDelaySeconds: 5
             periodSeconds: 5
           readinessProbe:
-            httpGet:
-              path: /actuator/health
-              scheme: HTTP
-              port: 8081
-            initialDelaySeconds: 15
-            periodSeconds: 5
+             httpGet:
+               path: /health
+               scheme: HTTP
+               port: 8080
+             initialDelaySeconds: 5
+             periodSeconds: 5
           resources:
             limits:
               cpu: 1
-              memory: 512Mi
+              memory: 256Mi
             requests:
               cpu: 100m
-              memory: 256Mi
+              memory: 100Mi
         - name: opa
-          image: openpolicyagent/opa:0.40.0-rootless
+          image: openpolicyagent/opa:0.34.2-envoy-rootless
           imagePullPolicy: Always
           args:
             - "run"
             - "--server"
             - "--ignore=.*"
-            - "--config-file=/config/opa.yaml"
+            - "--config-file=/config/conf.yaml"
+            - "--authorization=basic"
             - "--addr=http://127.0.0.1:8181"
             - "--diagnostic-addr=0.0.0.0:8282"
           securityContext:
@@ -129,19 +131,19 @@ spec:
                 - all
           volumeMounts:
             - readOnly: true
-              mountPath: /config/opa.yaml
-              subPath: opa.yaml
+              mountPath: /config/conf.yaml
+              subPath: conf.yaml
               name: opa-config-vol
           livenessProbe:
             httpGet:
               path: /health
               scheme: HTTP
               port: 8282
-            initialDelaySeconds: 5      # Tune these periods for your environemnt
+            initialDelaySeconds: 5
             periodSeconds: 5
           readinessProbe:
             httpGet:
-              path: /health?bundle=true  # Include bundle activation in readiness
+              path: /health
               scheme: HTTP
               port: 8282
             initialDelaySeconds: 5
@@ -149,4 +151,4 @@ spec:
       volumes:
         - name: opa-config-vol
           configMap:
-            name: entitlements-opa-config-cm
+            name: opa-istio-config

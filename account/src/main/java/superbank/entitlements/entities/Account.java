@@ -11,16 +11,15 @@ public class Account {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    private String iban;
-    @ManyToOne
-    private AccountHolder accountHolder;
-    private String geoRegion;
+    protected String iban;
+    private Long accountHolderId;
+    protected String geoRegion;
 
     protected Account() {}
 
-    public Account(String iban, AccountHolder accountHolder, String geoRegion) {
+    public Account(String iban, long accountHolderId, String geoRegion) {
         this.iban = iban;
-        this.accountHolder = accountHolder;
+        this.accountHolderId = accountHolderId;
         this.geoRegion = geoRegion;
     }
 
@@ -28,8 +27,8 @@ public class Account {
         return iban;
     }
 
-    public AccountHolder getAccountHolder() {
-        return accountHolder;
+    public long getAccountHolderId() {
+        return accountHolderId;
     }
 
     @Override

@@ -4,9 +4,14 @@ import input.attributes.request as request
 
 default allow = false
 
-
 allow {
   input.parsed_path[0] == "portal"
+}
+
+allow {
+  #account service is allowed to call accountholder service
+  input.attributes.destination.principal == "spiffe://cluster.local/ns/banking-demo/sa/accountholder-sa"
+  input.attributes.source.principal == "spiffe://cluster.local/ns/banking-demo/sa/account-sa"
 }
 
 allow {

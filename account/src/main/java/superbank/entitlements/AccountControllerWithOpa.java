@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +20,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import superbank.entitlements.entities.Account;
+import superbank.entitlements.entities.AccountHolder;
+import superbank.entitlements.entities.AccountWithHolder;
 import superbank.entitlements.entities.Transaction;
 
+import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-class AccountController {
+class AccountControllerWithOpa {
 
 	private final OpaClient opaClient;
 
@@ -33,26 +41,48 @@ class AccountController {
 
 	private final TransactionRepository transactionRepository;
 
-	private static final Logger log = LoggerFactory.getLogger(AccountController.class);
+	@Value("${ACCOUNT_HOLDER_URL:http://accountholder-svc/accountholder}")
+	private String accountHolderUrl = "";
 
-	public AccountController(@Autowired OpaClient opaClient,
-							 @Autowired AccountRepository accountRepository,
-							 @Autowired TransactionRepository transactionRepository) {
+	private final HttpClient httpClient = HttpClient.newBuilder().build();
+
+	private static final Logger log = LoggerFactory.getLogger(AccountControllerWithOpa.class);
+
+	public AccountControllerWithOpa(@Autowired OpaClient opaClient,
+                                    @Autowired AccountRepository accountRepository,
+                                    @Autowired TransactionRepository transactionRepository) {
 		this.opaClient = opaClient;
 		this.accountRepository = accountRepository;
 		this.transactionRepository = transactionRepository;
 	}
 
 	@GetMapping("/account/v2/{accountIban}/details")
-	ResponseEntity<Account> accountDetails(@PathVariable(name = "accountIban") String accountIban,
-										  @RequestHeader(name = "Authorization") String authHeader) {
+	ResponseEntity<AccountWithHolder> accountDetails(@PathVariable(name = "accountIban") String accountIban,
+													 @RequestHeader(name = "Authorization") String authHeader)
+			throws Exception {
 		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
 		Optional<Account> account = accountRepository.findAccountByIban(accountIban);
+		log.info("Retrieving account details for account {} by subject {}", accountIban, jwt.getClaim("sub").asString());
 		if (account.isPresent()) {
+			log.info("Requesting account holder for account {}", accountIban);
+			URI uri = new URI(accountHolderUrl + "/" + account.get().getAccountHolderId());
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(uri)
+					.GET()
+					.build();
+			HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+			if (response.statusCode() >= 300) {
+				log.error("Error getting account holder for account {}: code={} resp-body={}", uri, response.statusCode(), response.body());
+				return new ResponseEntity<>(
+						new AccountWithHolder(account.get(), new AccountHolder("Unauthorized", "Unauthorized")),
+						HttpStatus.OK);
+			}
 			if (authorizeAccountWithOpa(jwt, account.get())) {
-				return new ResponseEntity<>(account.get(), HttpStatus.OK);
+				return new ResponseEntity<>(
+						new AccountWithHolder(account.get(), new AccountHolder(response.body())),
+						HttpStatus.OK);
 			} else {
-				return ResponseEntity.status(403).build();
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 			}
 		} else {
 			return ResponseEntity.notFound().build();
@@ -66,7 +96,7 @@ class AccountController {
 		Optional<Account> account = accountRepository.findAccountByIban(accountIban);
 
 		if (!account.isPresent()) {
-			return ResponseEntity.status(404).body(errorNode("Account " + accountIban + " not found"));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorNode("Account " + accountIban + " not found"));
 		}
 
         List<Transaction> dbTransactions = transactionRepository.findAllByAccountIban(accountIban, Sort.by(Sort.Direction.DESC, "timeStamp"));
@@ -106,7 +136,7 @@ class AccountController {
 		ObjectNode accountNode = new ObjectMapper().createObjectNode();
 		accountNode.put("iban", account.getIban());
 		accountNode.put("geo_region", account.getGeoRegion());
-		accountNode.putPOJO("account_holder", account.getAccountHolder());
+		// accountNode.putPOJO("account_holder", account.getAccountHolder());
 		input.set("account", accountNode);
 
 		List<String> roles = (List<String>) jwt.getClaim("realm_access").asMap().get("roles");

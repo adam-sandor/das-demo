@@ -52,6 +52,4 @@ class EntitlementsController {
 			throw new RuntimeException(ex);
 		}
 	}
-
-
 }

@@ -11,9 +11,7 @@ curl --request PUT \
   "secret": "'$GITHUB_TOKEN'"
   }'
 
-
-
-# create system banking_demo_account
+echo "Creating Istio System on $DAS_TENANT"
 curl --request POST \
   --url $DAS_TENANT/v1/systems \
   --header 'authorization: Bearer '$DAS_WORKSPACE_TOKEN'' \
@@ -88,82 +86,77 @@ curl --request POST \
     }
   }'
 
-
-
-# create system banking_demo_entitlements
+echo "Creating Portal System on $DAS_TENANT"
 curl --request POST \
   --url $DAS_TENANT/v1/systems \
   --header 'authorization: Bearer '$DAS_WORKSPACE_TOKEN'' \
   --header 'content-type: application/json' \
   --data \
   '{
-    "name": "banking_demo_entitlements",
-    "description": "",
+    "name": "banking_demo_portal",
+    "description": "Policies for deciding which actions does a user have access to in the UI",
     "read_only": false,
-    "type": "custom",
+    "type": "template.entitlements:1.0",
     "source_control": {
       "origin": {
         "credentials": "'$DAS_GIT_CREDENTIAL_NAME'",
-        "path": "policy/system/entitlements",
+        "path": "policy/system/portal",
         "reference": "'$GIT_REFERENCE'",
-      "url": "'$GIT_URL'"
+        "url": "'$GIT_URL'"
       }
-    },
-    "decision_mappings": {
-       "entitlements": {
-         "allowed": {
-           "path": "result.allowed",
-           "negated": false,
-           "expected": true
-         },
-         "reason": null,
-         "columns": null
-       }
-     }
+    }
   }'
 
-# cleanup policies banking_demo_entitlements
-SYSTEM_ID=$(curl --request GET \
-  --url ''$DAS_TENANT'/v1/systems?compact=true&policies=false&modules=false&datasources=false&errors=false&authz=false&metadata=false&type=custom&name=banking_demo_entitlements' \
+PORTAL_SYSTEM_ID=$(curl --request GET \
+  --url ''$DAS_TENANT'/v1/systems?compact=true&policies=false&modules=false&datasources=false&errors=false&authz=false&metadata=false&type=template.entitlements:1.0&name=banking_demo_portal' \
   --header 'authorization: Bearer '$DAS_WORKSPACE_TOKEN'' \
   --header 'content-type: application/json' | jq -r '.result[].id')
-curl --request DELETE \
-  --url $DAS_TENANT/v1/policies/systems/$SYSTEM_ID/rules \
+echo "Portal System ID is $PORTAL_SYSTEM_ID"
+
+curl --request PUT \
+  --url $DAS_TENANT/v1/secrets/systems/${PORTAL_SYSTEM_ID}/ldap/credentials \
+  --header "Authorization: Bearer $DAS_WORKSPACE_TOKEN" \
+  --header 'Content-Type: application/json' \
+  --data \
+  '{
+  "name": "uid=ldapadmin,ou=Users,o=6261cc256155e458568643b2,dc=jumpcloud,dc=com",
+  "secret": "12345678"
+  }'
+
+DATASOURCE_JSON=$(cat << EOF
+{
+  "ca_certificate": "",
+  "category": "ldap",
+  "credentials": "systems/${PORTAL_SYSTEM_ID}/ldap/credentials",
+  "description": "",
+  "enabled": true,
+  "id": "systems/${PORTAL_SYSTEM_ID}/ldap",
+  "policy_filter": "systems/${PORTAL_SYSTEM_ID}/transform/jumpcloud/jumpcloud.rego",
+  "policy_query": "data.transform.jumpcloud.all",
+  "polling_interval": 3600,
+  "rate_limit": 3,
+  "search": {
+    "attributes": [],
+    "base_DN": "o=6261cc256155e458568643b2,dc=jumpcloud,dc=com",
+    "deref": "never",
+    "filter": "(objectClass=inetOrgPerson)",
+    "page_size": 0,
+    "scope": "whole-subtree",
+    "size_limit": 0
+  },
+  "type": "pull",
+  "urls": [
+    "ldaps://ldap.jumpcloud.com"
+  ]
+}
+EOF
+)
+
+curl --request PUT \
+  --url "$DAS_TENANT/v1/datasources/systems/${PORTAL_SYSTEM_ID}/ldap" \
   --header 'authorization: Bearer '$DAS_WORKSPACE_TOKEN'' \
-  --header 'content-type: application/json'
-curl --request DELETE \
-  --url $DAS_TENANT/v1/policies/systems/$SYSTEM_ID/test \
-  --header 'authorization: Bearer '$DAS_WORKSPACE_TOKEN'' \
-  --header 'content-type: application/json'
-curl --request DELETE \
-  --url $DAS_TENANT/v1/datasources/systems/$SYSTEM_ID/dataset \
-  --header 'authorization: Bearer '$DAS_WORKSPACE_TOKEN'' \
-  --header 'content-type: application/json'
-
-
-
-# create system banking_demo_gateway
-# curl --request POST \
-#   --url $DAS_TENANT/v1/systems \
-#   --header 'authorization: Bearer '$DAS_WORKSPACE_TOKEN'' \
-#   --header 'content-type: application/json' \
-#   --data \
-#   '{
-#     "name": "banking_demo_gateway",
-#     "description": "",
-#     "read_only": false,
-#     "type": "template.envoy:2.0",
-#     "source_control": {
-#       "origin": {
-#         "credentials": "'$DAS_GIT_CREDENTIAL_NAME'",
-#         "path": "policy/system/gateway",
-#         "reference": "'$GIT_REFERENCE'",
-#       "url": "'$GIT_URL'"
-#       }
-#     }
-#   }'
-
-
+  --header 'content-type: application/json' \
+  --data "$DATASOURCE_JSON"
 
 # create library banking_demo_jwt
 curl --request PUT \

@@ -1,0 +1,67 @@
+{
+  "groups": {
+    "All Users": {
+      "users": [
+        "agent_brown",
+        "agent_jones",
+        "agent_smith"
+      ]
+    }
+  },
+  "role_bindings": {
+    "All Users": {
+      "subjects": {
+        "ids": [
+          "All Users",
+          "agent_brown",
+          "agent_jones",
+          "agent_smith"
+        ]
+      }
+    }
+  },
+  "users": {
+    "agent_brown": {
+      "country": "NL",
+      "employeeType": "customer_support",
+      "geo_region": "EU",
+      "gidNumber": 5004,
+      "groups": [
+        "All Users"
+      ],
+      "postalAddress": "1 work street$Amsterdam$NL",
+      "role": "customer_support",
+      "role_level": 2,
+      "title": "customer support agent level 2",
+      "uidNumber": 5004
+    },
+    "agent_jones": {
+      "country": "US",
+      "employeeType": "customer_support",
+      "geo_region": "US",
+      "gidNumber": 5006,
+      "groups": [
+        "All Users"
+      ],
+      "postalAddress": "1 work street$New York NY 99999$US",
+      "role": "customer_support",
+      "role_level": 2,
+      "title": "customer support agent level 2",
+      "uidNumber": 5006
+    },
+    "agent_smith": {
+      "country": "DE",
+      "employeeType": "customer_support",
+      "geo_region": "EU",
+      "gidNumber": 5005,
+      "groups": [
+        "All Users"
+      ],
+      "postalAddress": "1 work street$Frankfurt$DE",
+      "role": "customer_support",
+      "role_level": 3,
+      "title": "customer support agent level 3",
+      "uidNumber": 5005
+    }
+  }
+}

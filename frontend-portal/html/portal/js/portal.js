@@ -95,8 +95,7 @@ $('#account-details').click(function () {
     };
 
     const error = function (data) {
-        $("#error").show();
-        $("#error .error-text").text("Failed to load account details (" + data.statusText + " [" + data.status + "])");
+        displayError(data)
     }
     $.ajax({
         type: "GET",
@@ -139,8 +138,7 @@ $('#account-transactions').click(function () {
     };
 
     const error = function (data) {
-        $("#error").show();
-        $("#error .error-text").text("Failed to load account transactions (" + data.statusText + " [" + data.status + "])");
+        displayError(data);
     }
     $.ajax({
         type: "GET",
@@ -161,6 +159,21 @@ function accountServiceUrl() {
         return '/account/'
     } else {
         return '/account/v2/'
+    }
+}
+
+function displayError(data) {
+    $("#error").show();
+    const parent = $("#error .error-text");
+    parent.empty();
+    if (data.status === 403) {
+        parent.append(`<p>Not authorized to load account details for account ${$('#account-iban-input').val()}:</p><ul>`)
+        data.responseJSON.denyReasons.forEach(function(denyReason) {
+            parent.append(`<li>${denyReason}</li>`)
+        })
+        parent.append("</ul>")
+    } else {
+        parent.text("Failed to load account details (" + data.statusText + " [" + data.status + "])");
     }
 }
 

@@ -19,16 +19,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import superbank.entitlements.entities.Account;
-import superbank.entitlements.entities.AccountHolder;
-import superbank.entitlements.entities.AccountWithHolder;
-import superbank.entitlements.entities.Transaction;
+import superbank.entitlements.entities.*;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,7 +55,7 @@ class AccountControllerWithOpa {
 	}
 
 	@GetMapping("/account/v2/{accountIban}/details")
-	ResponseEntity<AccountWithHolder> accountDetails(@PathVariable(name = "accountIban") String accountIban,
+	ResponseEntity<?> accountDetails(@PathVariable(name = "accountIban") String accountIban,
 													 @RequestHeader(name = "Authorization") String authHeader)
 			throws Exception {
 		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
@@ -77,12 +75,13 @@ class AccountControllerWithOpa {
 						new AccountWithHolder(account.get(), new AccountHolder("Unauthorized", "Unauthorized")),
 						HttpStatus.OK);
 			}
-			if (authorizeAccountWithOpa(jwt, account.get())) {
+			List<String> denyReasons = authorizeAccountWithOpa(jwt, account.get());
+			if (denyReasons.size() == 0) {
 				return new ResponseEntity<>(
 						new AccountWithHolder(account.get(), new AccountHolder(response.body())),
 						HttpStatus.OK);
 			} else {
-				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new DenyResponse(denyReasons));
 			}
 		} else {
 			return ResponseEntity.notFound().build();
@@ -90,7 +89,7 @@ class AccountControllerWithOpa {
 	}
 
 	@GetMapping("/account/v2/{accountIban}/transactions")
-	ResponseEntity<JsonNode> accountTransactions(@PathVariable(name = "accountIban") String accountIban,
+	ResponseEntity<?> accountTransactions(@PathVariable(name = "accountIban") String accountIban,
 												   @RequestHeader(name = "Authorization") String authHeader) {
 		DecodedJWT jwt = JWT.decode(AuthHeader.getBearerToken(authHeader));
 		Optional<Account> account = accountRepository.findAccountByIban(accountIban);
@@ -114,8 +113,11 @@ class AccountControllerWithOpa {
         });
 		QueryForDocumentRequest opaQuery = new QueryForDocumentRequest(opaInput, "policy/app");
 		ObjectNode opaResult = opaClient.queryForDocument(opaQuery, ObjectNode.class);
-		if (opaResult.get("deny").size() > 0) {
-			return ResponseEntity.status(403).body(opaResult.get("deny"));
+
+		List<String> denyReasons = new ArrayList<>();
+		opaResult.get("deny").elements().forEachRemaining((denyReason) -> denyReasons.add(denyReason.asText()));
+		if (denyReasons.size() > 0) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new DenyResponse(denyReasons));
 		} else {
 			ObjectNode response = new ObjectMapper().createObjectNode();
 			response.put("accountIban", accountIban);
@@ -146,18 +148,22 @@ class AccountControllerWithOpa {
 		return input;
 	}
 
-	private boolean authorizeAccountWithOpa(DecodedJWT jwt, Account account) {
+	private List<String> authorizeAccountWithOpa(DecodedJWT jwt, Account account) {
 		ObjectNode input = createOpaInputWithAccountAndSubject(jwt, account);
 		QueryForDocumentRequest opaQuery = new QueryForDocumentRequest(input, "policy/app");
 		ObjectNode opaResult = opaClient.queryForDocument(opaQuery, ObjectNode.class);
 
 		JsonNode deny = opaResult.get("deny");
+		List<String> denyReasons = new ArrayList<>();
+		deny.elements().forEachRemaining((denyElement) -> {
+			denyReasons.add(denyElement.asText());
+		});
 		if (deny.size() > 0) {
 			for (int i = 0; i < deny.size(); i++) {
 				log.info("OPA authz deny: {}", deny.get(i).asText());
 			}
 		}
-		return deny.size() == 0;
+		return denyReasons;
 	}
 
 	private static ObjectNode errorNode(String error) {
